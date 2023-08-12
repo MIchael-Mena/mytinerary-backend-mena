@@ -1,11 +1,13 @@
-const express = require('express')
+import express from 'express'
+import { getUser, createUser } from '../controllers/userController.js'
+
 const router = express.Router()
-const { getClient } = require('../controllers/clientController')
 
-router.get('/client/:id', getClient)
+router.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
-// router.get('/clients', (req, res) => {
-//   res.send('Hello World!')
-// })
+router.get('/user/:id', getUser)
+router.post('/user/create', createUser)
 
-module.exports = router
+export default router
