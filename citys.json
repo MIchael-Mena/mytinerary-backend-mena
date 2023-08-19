@@ -1,0 +1,260 @@
+[
+  {
+    "country": "France",
+    "name": "Paris",
+    "description": "The City of Love, famous for the Eiffel Tower, renowned museums, and a rich history.",
+    "capital": true,
+    "population": 2141000,
+    "area": 105.4,
+    "rating": 9.5,
+    "images": [
+      "https://images.adsttc.com/media/images/5d44/14fa/284d/d1fd/3a00/003d/large_jpg/eiffel-tower-in-paris-151-medium.jpg?1564742900"
+    ],
+    "language": "French",
+    "currency": "Euro",
+    "religion": "Catholicism",
+    "bestTime": "Spring",
+    "timezone": "CET"
+  },
+  {
+    "country": "Japan",
+    "name": "Tokyo",
+    "description": "A mix of tradition and modernity, with impressive skyscrapers, ancient temples, and delicious cuisine.",
+    "capital": true,
+    "population": 13929286,
+    "area": 2188.7,
+    "rating": 9.2,
+    "images": ["https://blog.dongfeng.ec/hubfs/pexels-photo-2614818.jpeg"],
+    "language": "Japanese",
+    "currency": "Yen",
+    "religion": "Shintoism, Buddhism",
+    "bestTime": "Spring and Autumn",
+    "timezone": "JST"
+  },
+  {
+    "country": "United States",
+    "name": "New York",
+    "description": "The Big Apple offers a unique experience with iconic skyscrapers, stunning parks, and a vibrant cultural scene.",
+    "capital": false,
+    "population": 8336817,
+    "area": 468.9,
+    "rating": 9.0,
+    "images": [
+      "https://interrailero.com/wp-content/uploads/2023/01/que-ver-en-nueva-york-en-7-dias-2.jpg"
+    ],
+    "language": "English",
+    "currency": "US Dollar",
+    "religion": "Christianity",
+    "bestTime": "Fall",
+    "timezone": "EST"
+  },
+  {
+    "country": "Brazil",
+    "name": "Rio de Janeiro",
+    "description": "Known for its emblematic beaches like Copacabana and Ipanema, the Christ the Redeemer statue, and the Carnival.",
+    "capital": false,
+    "population": 6747815,
+    "area": 1261,
+    "rating": 8.8,
+    "images": ["https://media1.travelguide.de/media/2021/12/rio-1.jpeg"],
+    "language": "Portuguese",
+    "currency": "Brazilian Real",
+    "religion": "Christianity",
+    "bestTime": "Summer",
+    "timezone": "BRT"
+  },
+  {
+    "country": "South Africa",
+    "name": "Cape Town",
+    "description": "A stunning destination that combines majestic mountains, beautiful beaches, and a rich wildlife.",
+    "capital": false,
+    "population": 433688,
+    "area": 400.3,
+    "rating": 9.3,
+    "images": [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Aerial_View_of_Sea_Point%2C_Cape_Town_South_Africa.jpg/1200px-Aerial_View_of_Sea_Point%2C_Cape_Town_South_Africa.jpg"
+    ],
+    "language": "Afrikaans, English",
+    "currency": "South African Rand",
+    "religion": "Christianity",
+    "bestTime": "Spring and Autumn",
+    "timezone": "SAST"
+  },
+  {
+    "country": "Spain",
+    "name": "Barcelona",
+    "description": "A city with astonishing architecture, lively beaches, artistic culture, and an exciting nightlife.",
+    "capital": false,
+    "population": 1620343,
+    "area": 101.9,
+    "rating": 9.1,
+    "images": [
+      "https://metropoliabierta.elespanol.com/uploads/s1/20/20/19/4/sagradafamilia.jpeg"
+    ],
+    "language": "Spanish",
+    "currency": "Euro",
+    "religion": "Catholicism",
+    "bestTime": "Spring and Fall",
+    "timezone": "CET"
+  },
+  {
+    "country": "Japan",
+    "name": "Kyoto",
+    "description": "A place full of temples, shrines, and Zen gardens that capture the essence of Japanese tradition.",
+    "capital": false,
+    "population": 1474570,
+    "area": 827.9,
+    "rating": 9.4,
+    "images": [
+      "https://media.tacdn.com/media/attractions-content--1x-1/10/29/d5/01.jpg"
+    ],
+    "language": "Japanese",
+    "currency": "Yen",
+    "religion": "Shintoism, Buddhism",
+    "bestTime": "Spring and Autumn",
+    "timezone": "JST"
+  },
+  {
+    "country": "Indonesia",
+    "name": "Bali",
+    "description": "A paradise island with stunning beaches, terraced rice fields, and a unique spiritual culture.",
+    "capital": false,
+    "population": 4280000,
+    "area": 5780,
+    "rating": 9.0,
+    "images": [
+      "https://millasxelmundo.com/wp-content/uploads/2021/06/Bali-isla-paradiasiaca_1949525056_3574661_1300x731.jpg"
+    ],
+    "language": "Indonesian",
+    "currency": "Indonesian Rupiah",
+    "religion": "Hinduism",
+    "bestTime": "April to September",
+    "timezone": "WITA"
+  },
+  {
+    "country": "Italy",
+    "name": "Rome",
+    "description": "The cradle of ancient Roman civilization, filled with historical monuments like the Colosseum and the Vatican.",
+    "capital": true,
+    "population": 2873000,
+    "area": 1285,
+    "rating": 9.1,
+    "images": ["https://media.timeout.com/images/105453834/750/422/image.jpg"],
+    "language": "Italian",
+    "currency": "Euro",
+    "religion": "Roman Catholicism",
+    "bestTime": "Spring and Fall",
+    "timezone": "CET"
+  },
+  {
+    "country": "Jordan",
+    "name": "Petra",
+    "description": "An ancient city carved into pink stone, known as the \"Rose City\".",
+    "capital": false,
+    "population": 0,
+    "area": 264,
+    "rating": 9.3,
+    "images": [
+      "https://media.traveler.es/photos/613768a4ba2a75fcba4be720/master/w_1600%2Cc_limit/154153.jpg"
+    ],
+    "language": "Arabic",
+    "currency": "Jordanian Dinar",
+    "religion": "Islam",
+    "bestTime": "Spring and Fall",
+    "timezone": "AST"
+  },
+  {
+    "country": "Australia",
+    "name": "Sydney",
+    "description": "With its iconic Opera House and Harbour Bridge, it offers a blend of urban life and natural beauty.",
+    "capital": false,
+    "population": 5230330,
+    "area": 12144.6,
+    "rating": 9.2,
+    "images": [
+      "https://cafedelasciudades.com.ar/wp-content/uploads/2022/12/Guia-turistica-de-Sidney.jpg"
+    ],
+    "language": "English",
+    "currency": "Australian Dollar",
+    "religion": "Christianity",
+    "bestTime": "Spring and Fall",
+    "timezone": "AEST"
+  },
+  {
+    "country": "Peru",
+    "name": "Machu Picchu",
+    "description": "The ancient Incan city in the mountains, surrounded by breathtaking scenery.",
+    "capital": false,
+    "population": 0,
+    "area": 32.5,
+    "rating": 9.5,
+    "images": [
+      "https://cloudfront-us-east-1.images.arcpublishing.com/infobae/QODFX2DCF5HKTD2XN2HM6V42VY.jpg"
+    ],
+    "language": "Spanish, Quechua",
+    "currency": "Peruvian Sol",
+    "religion": "Christianity, Indigenous Beliefs",
+    "bestTime": "May to September",
+    "timezone": "PET"
+  },
+  {
+    "country": "Greece",
+    "name": "Athens",
+    "description": "The cradle of Western civilization, known for its ancient ruins, including the Acropolis and Parthenon.",
+    "capital": true,
+    "population": 664046,
+    "area": 412,
+    "rating": 9.0,
+    "images": [],
+    "language": "Greek",
+    "currency": "Euro",
+    "religion": "Greek Orthodox",
+    "bestTime": "Spring and Fall",
+    "timezone": "EET"
+  },
+  {
+    "country": "Mexico",
+    "name": "Mexico City",
+    "description": "A vibrant metropolis with a mix of historical landmarks, modern architecture, and rich cultural heritage.",
+    "capital": true,
+    "population": 9185842,
+    "area": 1485,
+    "rating": 8.8,
+    "images": [],
+    "language": "Spanish",
+    "currency": "Mexican Peso",
+    "religion": "Roman Catholicism",
+    "bestTime": "Spring and Fall",
+    "timezone": "CST"
+  },
+  {
+    "country": "Turkey",
+    "name": "Istanbul",
+    "description": "A transcontinental city known for its blend of Eastern and Western cultures, historic sites like the Hagia Sophia, and vibrant markets.",
+    "capital": false,
+    "population": 15029231,
+    "area": 5461,
+    "rating": 9.2,
+    "images": [],
+    "language": "Turkish",
+    "currency": "Turkish Lira",
+    "religion": "Islam",
+    "bestTime": "Spring and Fall",
+    "timezone": "TRT"
+  },
+  {
+    "country": "Egypt",
+    "name": "Cairo",
+    "description": "An ancient city along the Nile River, home to the Pyramids and a rich historical legacy.",
+    "capital": true,
+    "population": 10007595,
+    "area": 606,
+    "rating": 8.9,
+    "images": [],
+    "language": "Arabic",
+    "currency": "Egyptian Pound",
+    "religion": "Islam",
+    "bestTime": "Fall and Spring",
+    "timezone": "EET"
+  }
+]

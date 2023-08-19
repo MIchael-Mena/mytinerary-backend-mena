@@ -1,17 +1,24 @@
 // Necesario si se cambia de carpeta el archivo .env, pero hay que hacerlo en todos los archivos que lo usen
-// import dotenv from 'dotenv'
-// dotenv.config({ path: 'src/.env' })
+// import dotenv from "dotenv"
+// dotenv.config({ path: "src/.env" })
 
 import 'dotenv/config.js'
 import express from 'express'
 import router from './router/router.js'
 import './config/database.js'
+import errorHandler from './middleware/global/errorHandler.js'
+import notFoundHandler from './middleware/global/notFoundHandler.js'
+import routerCity from './router/routerCity.js'
 
 const app = express()
 
 app.use(express.json())
 
-app.use('/api', router) // primer parametro es opcional
+app.use('/api', router)
+app.use('/api', routerCity) // primer parametro es opcional
+
+app.use(errorHandler)
+app.use(notFoundHandler)
 
 app.listen(process.env.PORT, () => {
   console.log('Server is up on port ' + process.env.PORT)
