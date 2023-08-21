@@ -139,7 +139,9 @@
     "population": 2873000,
     "area": 1285,
     "rating": 9.1,
-    "images": ["https://media.timeout.com/images/105453834/750/422/image.jpg"],
+    "images": [
+      "https://elcomercio.pe/resizer/moFP7riBzwBVAfj261qNbHuxtc8=/980x0/smart/filters:format(jpeg):quality(75)/cloudfront-us-east-1.images.arcpublishing.com/elcomercio/BH23GG3F2ZAITPGW4BC2CLCV64.jpg"
+    ],
     "language": "Italian",
     "currency": "Euro",
     "religion": "Roman Catholicism",
@@ -205,7 +207,9 @@
     "population": 664046,
     "area": 412,
     "rating": 9.0,
-    "images": [],
+    "images": [
+      "https://vivirmass.com/wp-content/uploads/2019/10/ATENAS-GRECIA.jpg"
+    ],
     "language": "Greek",
     "currency": "Euro",
     "religion": "Greek Orthodox",
@@ -220,7 +224,9 @@
     "population": 9185842,
     "area": 1485,
     "rating": 8.8,
-    "images": [],
+    "images": [
+      "https://afar.brightspotcdn.com/dims4/default/c354629/2147483647/strip/true/crop/1357x720+41+0/resize/1440x764!/quality/90/?url=https%3A%2F%2Fafar-media-production-web.s3.amazonaws.com%2Fbrightspot%2F13%2Fad%2Fa968ccf54af783d2f7aa93839bb1%2Ftravelguide-mexicocity-ramiroreynajr.jpg"
+    ],
     "language": "Spanish",
     "currency": "Mexican Peso",
     "religion": "Roman Catholicism",
@@ -235,7 +241,9 @@
     "population": 15029231,
     "area": 5461,
     "rating": 9.2,
-    "images": [],
+    "images": [
+      "https://mexicorutamagica.mx/wp-content/uploads/2022/05/estambul-turquia.jpg"
+    ],
     "language": "Turkish",
     "currency": "Turkish Lira",
     "religion": "Islam",
@@ -250,7 +258,9 @@
     "population": 10007595,
     "area": 606,
     "rating": 8.9,
-    "images": [],
+    "images": [
+      "https://viajerosocultos.com/wp-content/uploads/2023/01/pexels-simon-berger-10586819-scaled.jpg"
+    ],
     "language": "Arabic",
     "currency": "Egyptian Pound",
     "religion": "Islam",

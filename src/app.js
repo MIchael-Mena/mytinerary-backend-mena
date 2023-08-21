@@ -9,10 +9,12 @@ import './config/database.js'
 import errorHandler from './middleware/global/errorHandler.js'
 import notFoundHandler from './middleware/global/notFoundHandler.js'
 import routerCity from './router/routerCity.js'
+import cors from 'cors'
 
 const app = express()
 
-app.use(express.json())
+app.use(cors())
+app.use(express.json()) // para que express entienda el formato json
 
 app.use('/api', router)
 app.use('/api', routerCity) // primer parametro es opcional

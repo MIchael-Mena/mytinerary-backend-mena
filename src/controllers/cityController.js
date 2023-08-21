@@ -1,10 +1,16 @@
 import City from '../models/City.js'
 import jsonResponse from '../utils/jsonResponse.js'
 
-// Query params, ej: /cities?sortByRating=desc&limit=5&search=bar
+// Query params, ej: /cities?sort=rating&order=desc&limit=5&search=bar
 const getCities = async (req, res, next) => {
   try {
-    const sortByRating = req.query.sortByRating === 'desc' ? -1 : 1
+    const sortField = req.query.sort ? req.query.sort : 'updatedAt'
+    const sortOrder = req.query.order === 'desc' ? -1 : 1
+
+    const sortOptions = {
+      [sortField]: sortOrder,
+    }
+
     const limit = req.query.limit ? parseInt(req.query.limit) : 0 // 0 = no limit
 
     let searchQuery = req.query.search
@@ -18,7 +24,8 @@ const getCities = async (req, res, next) => {
     // query = { name: regex }
 
     const cities = await City.find(query)
-      .sort({ rating: sortByRating })
+      // @ts-ignore
+      .sort(sortOptions)
       .limit(limit)
 
     if (cities.length === 0)
