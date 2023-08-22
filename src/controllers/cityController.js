@@ -50,7 +50,7 @@ const getCity = async (req, res, next) => {
   try {
     const city = await City.findById(req.params.id)
     if (!city) return jsonResponse(false, res, 404, 'City not found.')
-    res.status(200).json(city)
+    jsonResponse(true, res, 200, 'City retrieved successfully.', city)
   } catch (error) {
     next(error)
   }
@@ -73,7 +73,7 @@ const updateCityOrReplace = async (updateMethod, req, res, next) => {
       runValidators: true, // ejecuta las validaciones del modelo
     })
     if (!city) return jsonResponse(false, res, 404, 'City not found.')
-    res.status(200).json(city)
+    jsonResponse(true, res, 200, 'City updated successfully.', city)
   } catch (error) {
     next(error)
   }
