@@ -28,8 +28,17 @@ const getCities = async (req, res, next) => {
       .sort(sortOptions)
       .limit(limit)
 
-    if (cities.length === 0)
-      return jsonResponse(false, res, 404, 'Cities not found.')
+    if (cities.length === 0 && searchQuery) {
+      return jsonResponse(
+        false,
+        res,
+        200,
+        `No cities found starting with '${searchQuery}'.`,
+        cities
+      )
+    } else if (cities.length === 0) {
+      return jsonResponse(false, res, 200, 'Cities not found.', cities)
+    }
 
     jsonResponse(true, res, 200, 'Cities retrieved successfully.', cities)
   } catch (error) {
