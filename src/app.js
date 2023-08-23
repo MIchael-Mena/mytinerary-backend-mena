@@ -4,7 +4,6 @@
 
 import 'dotenv/config.js'
 import express from 'express'
-import router from './router/router.js'
 import './config/database.js'
 import errorHandler from './middleware/global/errorHandler.js'
 import notFoundHandler from './middleware/global/notFoundHandler.js'
@@ -16,7 +15,6 @@ const app = express()
 app.use(cors())
 app.use(express.json()) // para que express entienda el formato json
 
-app.use('/api', router)
 app.use('/api', routerCity) // primer parametro es opcional
 
 app.use(errorHandler)
