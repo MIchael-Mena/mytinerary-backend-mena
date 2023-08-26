@@ -14,7 +14,7 @@ const addAccount = async (req, res) => {
 
     await user.updateOne({
       accounts: [...user.accounts, newAccount],
-    })
+    }) // Actualiza el usuario con la nueva cuenta, pero no devuelve el usuario actualizado
 
     let userUpdated = await User.findById(userId).populate('accounts')
 
