@@ -8,6 +8,8 @@ import './config/database.js'
 import errorHandler from './middleware/global/errorHandler.js'
 import notFoundHandler from './middleware/global/notFoundHandler.js'
 import routerCity from './router/routerCity.js'
+import routerUser from './router/routerUser.js'
+import routerItinerary from './router/routerItinerary.js'
 import cors from 'cors'
 
 const app = express()
@@ -15,7 +17,7 @@ const app = express()
 app.use(cors())
 app.use(express.json()) // para que express entienda el formato json
 
-app.use('/api', routerCity) // primer parametro es opcional
+app.use('/api', [routerUser, routerCity, routerItinerary])
 
 app.use(errorHandler)
 app.use(notFoundHandler)

@@ -11,6 +11,12 @@ const validateQueryParams = (req, res, next) => {
     )
   }
 
+  if (req.query.page && req.query.page <= 0) {
+    errors.push(
+      "Invalid value for 'page' query parameter. It must be a positive number."
+    )
+  }
+
   if (req.query.limit) {
     const limitValue = parseInt(req.query.limit)
 

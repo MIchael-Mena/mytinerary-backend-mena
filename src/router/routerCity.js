@@ -1,7 +1,6 @@
 import express from 'express'
 import {
-  getCities,
-  createCities,
+  getCityById,
   getCity,
   createCity,
   updateCity,
@@ -12,13 +11,13 @@ import validateQueryParams from '../middleware/city/validateQueryParams.js'
 
 const routerCity = express.Router()
 
-routerCity.get('/cities', validateQueryParams, getCities)
-routerCity.post('/cities/create', createCities)
-
-routerCity.get('/city/:id', getCity)
-routerCity.post('/city/create', createCity)
-routerCity.patch('/city/update/:id', updateCity)
-routerCity.put('/city/replace/:id', replaceCity)
-routerCity.delete('/city/delete/:id', deleteCity)
+routerCity.use('/city', [
+  express.Router().get('/', validateQueryParams, getCity),
+  express.Router().get('/:id', getCityById),
+  express.Router().post('/create', createCity),
+  express.Router().patch('/update/:id', updateCity),
+  express.Router().put('/replace/:id', replaceCity),
+  express.Router().delete('/delete/:id', deleteCity),
+])
 
 export default routerCity

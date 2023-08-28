@@ -15,18 +15,7 @@ const CitySchema = new Schema(
     religion: { type: String, required: true, maxlength: 100 },
     bestTime: { type: String, required: true, maxlength: 100 },
     timezone: { type: String, required: true, maxlength: 100 },
-    // location: {
-    //   lat: { type: Number, required: true },
-    //   long: { type: Number, required: true },
-    // },
-    // weather: {
-    //   temp: { type: Number, required: true },
-    //   wind: { type: Number, required: true },
-    //   humidity: { type: Number, required: true },
-    //   description: { type: String, required: true },
-    // },
-    // activities: [{ type: Types.ObjectId, ref: "Activity" }],
-    // itinerary: [{ type: Types.ObjectId, ref: "Itinerary" }],
+    itinerary: [{ type: Types.ObjectId, ref: 'Itinerary' }],
   },
   { timestamps: true }
 )
