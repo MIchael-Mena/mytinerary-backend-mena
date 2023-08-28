@@ -1,7 +1,8 @@
 import City from '../models/City.js'
+import Itinerary from '../models/Itinerary.js'
 import jsonResponse from '../utils/jsonResponse.js'
 
-// Query params, ej: /cities?sort=rating&order=desc&limit=5&search=bar
+// Query params, ej: /city?sort=rating&order=desc&limit=5&page=2&search=bar
 const getCity = async (req, res, next) => {
   try {
     const sortField = req.query.sort ? req.query.sort : 'updatedAt'
@@ -27,18 +28,24 @@ const getCity = async (req, res, next) => {
       .sort(sortOptions)
       .skip((page - 1) * limit) // Documentos a saltar
       .limit(limit)
+      .populate({
+        path: 'itineraries',
+        populate: {
+          path: 'user',
+          select: 'name surname profilePic',
+        },
+      })
 
-    if (cities.length === 0 && searchQuery) {
+    if (cities.length === 0)
       return jsonResponse(
         false,
         res,
         200,
-        `No cities found starting with '${searchQuery}'.`,
+        searchQuery
+          ? `No cities found starting with '${searchQuery}'.`
+          : 'Cities not found.',
         cities
       )
-    } else if (cities.length === 0) {
-      return jsonResponse(false, res, 200, 'Cities not found.', cities)
-    }
 
     jsonResponse(true, res, 200, 'Cities retrieved successfully.', cities)
   } catch (error) {
@@ -58,7 +65,14 @@ const createCity = async (req, res, next) => {
 
 const getCityById = async (req, res, next) => {
   try {
-    const city = await City.findById(req.params.id)
+    const city = await City.findById(req.params.id).populate({
+      path: 'itineraries',
+      populate: {
+        path: 'user',
+        select: 'name surname profilePic',
+      },
+    })
+
     if (!city) return jsonResponse(false, res, 404, 'City not found.')
     jsonResponse(true, res, 200, 'City retrieved successfully.', city)
   } catch (error) {
@@ -103,6 +117,11 @@ const deleteCity = async (req, res, next) => {
   try {
     const city = await City.findByIdAndDelete(req.params.id)
     if (!city) return jsonResponse(false, res, 404, 'City not found.')
+
+    await Itinerary.deleteMany({ _city: city._id })
+
+    await city.deleteOne()
+
     jsonResponse(true, res, 200, 'City deleted successfully.')
   } catch (error) {
     next(error)

@@ -12,7 +12,7 @@ const ItinerarySchema = new Schema(
     },
     user: {
       type: Types.ObjectId,
-      ref: 'UserDetail', // NO se usa 'User' no se neceista la contraseña etc, debemos recibir el id de User en controller
+      ref: 'User',
     },
     likes: {
       type: Number,
