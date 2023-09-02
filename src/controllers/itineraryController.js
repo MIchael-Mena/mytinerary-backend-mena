@@ -2,6 +2,7 @@ import Itinerary from '../models/Itinerary.js'
 import City from '../models/City.js'
 import jsonResponse from '../utils/jsonResponse.js'
 import User from '../models/User.js'
+import { Types } from 'mongoose'
 
 const populateItinerary = [
   {
@@ -19,6 +20,8 @@ const createItinerary = async (req, res, next) => {
   try {
     const { _city, user } = req.body
 
+    if (!Types.ObjectId.isValid(_city) || !Types.ObjectId.isValid(user))
+      return jsonResponse(false, res, 404, 'City or user not found')
     const cityExist = await City.findById(_city)
     const userExist = await User.findById(user)
 

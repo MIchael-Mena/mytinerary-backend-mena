@@ -5,14 +5,15 @@ import {
   deleteItinerary,
   updateItinerary,
 } from '../controllers/itineraryController.js'
+import validateId from '../middleware/validateId.js'
 
 const routerItinerary = express.Router()
 
 routerItinerary.use('/itinerary', [
-  express.Router().get('/:id', getItinerary),
+  express.Router().get('/:id', validateId, getItinerary),
   express.Router().post('/create', createItinerary),
-  express.Router().delete('/delete/:id', deleteItinerary),
-  express.Router().patch('/update/:id', updateItinerary),
+  express.Router().delete('/delete/:id', validateId, deleteItinerary),
+  express.Router().patch('/update/:id', validateId, updateItinerary),
 ])
 
 export default routerItinerary

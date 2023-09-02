@@ -1,6 +1,7 @@
 import City from '../models/City.js'
 import Itinerary from '../models/Itinerary.js'
 import jsonResponse from '../utils/jsonResponse.js'
+// import { Types } from 'mongoose'
 
 // Query params, ej: /city?sort=rating&order=desc&limit=5&page=2&search=bar
 const getCity = async (req, res, next) => {
