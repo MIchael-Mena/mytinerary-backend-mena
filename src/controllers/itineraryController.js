@@ -15,33 +15,53 @@ const populateItinerary = [
   },
 ]
 
-// TODO: Actualizar la ciudad cuando se crea un itinerario
 const createItinerary = async (req, res, next) => {
   try {
-    const { _city, user } = req.body
+    const itinerariesData = Array.isArray(req.body) ? req.body : [req.body]
 
-    if (!Types.ObjectId.isValid(_city) || !Types.ObjectId.isValid(user))
-      return jsonResponse(false, res, 404, 'City or user not found')
-    const cityExist = await City.findById(_city)
-    const userExist = await User.findById(user)
+    const itineraryPromises = []
 
-    if (!cityExist || !userExist)
-      return jsonResponse(
-        false,
-        res,
-        404,
-        cityExist ? 'User not found' : 'City not found'
-      )
+    for (const itineraryData of itinerariesData) {
+      const { _city, user } = itineraryData
 
-    const newItinerary = await (
-      await Itinerary.create(req.body)
-    ).populate(populateItinerary)
+      const cityIdIsValid = Types.ObjectId.isValid(_city)
+      const userIdIsValid = Types.ObjectId.isValid(user)
+      if (!cityIdIsValid || !userIdIsValid) {
+        return jsonResponse(
+          false,
+          res,
+          404,
+          cityIdIsValid
+            ? `User '${user}' not found`
+            : `City '${_city}' not found`
+        )
+      }
 
-    // @ts-ignore
-    cityExist.itineraries.push(newItinerary._id)
-    await cityExist.save()
+      const cityExist = await City.findById(_city)
+      const userExist = await User.findById(user)
 
-    jsonResponse(true, res, 201, newItinerary)
+      if (!cityExist || !userExist) {
+        return jsonResponse(
+          false,
+          res,
+          404,
+          cityExist ? `User '${user}' not found` : `City '${_city}' not found`
+        )
+      }
+
+      const newItinerary = await (
+        await Itinerary.create(itineraryData)
+      ).populate(populateItinerary)
+
+      cityExist.itineraries.push(newItinerary.id)
+      await cityExist.save()
+
+      itineraryPromises.push(newItinerary)
+    }
+
+    const newItineraries = await Promise.all(itineraryPromises)
+
+    jsonResponse(true, res, 201, newItineraries)
   } catch (error) {
     next(error)
   }

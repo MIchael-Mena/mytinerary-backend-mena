@@ -6,6 +6,7 @@ import {
   updateCity,
   replaceCity,
   deleteCity,
+  deleteItineraries,
 } from '../controllers/cityController.js'
 import validateQueryParams from '../middleware/city/validateQueryParams.js'
 import validateId from '../middleware/validateId.js'
@@ -19,6 +20,9 @@ routerCity.use('/city', [
   express.Router().patch('/update/:id', validateId, updateCity),
   express.Router().put('/replace/:id', validateId, replaceCity),
   express.Router().delete('/delete/:id', validateId, deleteCity),
+  express
+    .Router()
+    .delete('/delete-itineraries/:id', validateId, deleteItineraries),
 ])
 
 export default routerCity

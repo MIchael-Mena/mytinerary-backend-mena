@@ -1,9 +1,8 @@
 import City from '../models/City.js'
 import Itinerary from '../models/Itinerary.js'
 import jsonResponse from '../utils/jsonResponse.js'
-// import { Types } from 'mongoose'
 
-// Query params, ej: /city?sort=rating&order=desc&limit=5&page=2&search=bar
+// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar
 const getCity = async (req, res, next) => {
   try {
     const sortField = req.query.sort ? req.query.sort : 'updatedAt'
@@ -83,7 +82,13 @@ const getCityById = async (req, res, next) => {
 
 const updateCityOrReplace = async (updateMethod, req, res, next) => {
   try {
-    const city = await updateMethod({ _id: req.params.id }, req.body, {
+    // El itinerario se puede actualizar en los endpoints de itinerario
+    const cityData = req.body
+    const { itineraries } = cityData
+    if (itineraries) {
+      delete cityData.itineraries
+    }
+    const city = await updateMethod({ _id: req.params.id }, itineraries, {
       new: true, // devuelve el documento modificado
       runValidators: true, // ejecuta las validaciones del modelo
     })
@@ -129,4 +134,39 @@ const deleteCity = async (req, res, next) => {
   }
 }
 
-export { getCity, getCityById, createCity, updateCity, replaceCity, deleteCity }
+const deleteItineraries = async (req, res, next) => {
+  try {
+    const city = await City.findById(req.params.id)
+    if (!city) return jsonResponse(false, res, 404, 'City not found.')
+
+    const { itineraries } = city
+
+    if (itineraries.length === 0)
+      return jsonResponse(
+        false,
+        res,
+        404,
+        'There are no itineraries to delete.'
+      )
+
+    await Itinerary.deleteMany({ _id: { $in: itineraries } })
+
+    city.itineraries = []
+
+    await city.save()
+
+    jsonResponse(true, res, 200, 'Itineraries deleted successfully.')
+  } catch (error) {
+    next(error)
+  }
+}
+
+export {
+  getCity,
+  getCityById,
+  createCity,
+  updateCity,
+  replaceCity,
+  deleteCity,
+  deleteItineraries,
+}
