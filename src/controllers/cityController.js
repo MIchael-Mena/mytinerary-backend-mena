@@ -2,6 +2,11 @@ import City from '../models/City.js'
 import Itinerary from '../models/Itinerary.js'
 import jsonResponse from '../utils/jsonResponse.js'
 
+const pagination = {
+  limit: 16, // Cambiar a 12 despues de actualizar front
+  page: 1,
+}
+
 // Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar
 const getCity = async (req, res, next) => {
   try {
@@ -12,8 +17,8 @@ const getCity = async (req, res, next) => {
       [sortField]: sortOrder, // Se puede agregar más de un criterio de ordenamiento
     }
 
-    const limit = req.query.limit ? parseInt(req.query.limit) : 9 // 0 = no limit
-    const page = req.query.page ? parseInt(req.query.page) : 1 // 1 = first page
+    const limit = req.query.limit ? parseInt(req.query.limit) : pagination.limit // 0 = no limit
+    const page = req.query.page ? parseInt(req.query.page) : pagination.page // 1 = first page
     let searchQuery = req.query.search
       ? req.query.search.trim().toLowerCase()
       : ''
@@ -22,6 +27,8 @@ const getCity = async (req, res, next) => {
       : {}
     // const regex = new RegExp(`^${searchQuery}`, 'i') // Expresión regular de JS
     // query = { name: regex }
+
+    const totalCitiesCount = await City.countDocuments(query)
 
     const cities = await City.find(query)
       // @ts-ignore
@@ -47,11 +54,85 @@ const getCity = async (req, res, next) => {
         cities
       )
 
-    jsonResponse(true, res, 200, 'Cities retrieved successfully.', cities)
+    const maxPage = Math.ceil(totalCitiesCount / limit)
+
+    jsonResponse(true, res, 200, { maxPage: maxPage.toString() }, cities)
   } catch (error) {
     next(error)
   }
 }
+
+// Version Alternativa con agregación, ventaja: se puede obtener el total de documentos sin necesidad de hacer un countDocuments
+// const getCity = async (req, res, next) => {
+//   try {
+//     const pagination = {
+//       limit: 9,
+//       page: 1,
+//     }
+
+//     const sortField = req.query.sort ? req.query.sort : 'updatedAt'
+//     const sortOrder = req.query.order === 'desc' ? -1 : 1
+
+//     const sortOptions = {
+//       [sortField]: sortOrder, // Se puede agregar más de un criterio de ordenamiento
+//     }
+
+//     const limit = req.query.limit ? parseInt(req.query.limit) : pagination.limit // 0 = no limit
+//     const page = req.query.page ? parseInt(req.query.page) : pagination.page // 1 = first page
+//     let searchQuery = req.query.search
+//       ? req.query.search.trim().toLowerCase()
+//       : ''
+//     let query = searchQuery
+//       ? { name: { $regex: `^${searchQuery}`, $options: 'i' } } // Expresión regular de mongo
+//       : {}
+
+//     const aggregationPipeline = [
+//       {
+//         $match: query,
+//       },
+//       {
+//         $sort: sortOptions,
+//       },
+//       {
+//         $facet: {
+//           results: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+//           totalCount: [{ $count: 'count' }],
+//         },
+//       },
+//     ]
+
+//     // @ts-ignore
+//     const [aggregationResult] = await City.aggregate(aggregationPipeline)
+
+//     const cities = aggregationResult.results
+//     const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
+
+//     if (cities.length === 0)
+//       return jsonResponse(
+//         false,
+//         res,
+//         200,
+//         searchQuery
+//           ? `No cities found starting with '${searchQuery}'.`
+//           : 'Cities not found.',
+//         cities
+//       )
+
+//     await City.populate(cities, {
+//       path: 'itineraries',
+//       populate: {
+//         path: 'user',
+//         select: 'name surname profilePic',
+//       },
+//     })
+
+//     const maxPage = Math.ceil(totalCitiesCount / limit)
+
+//     jsonResponse(true, res, 200, { maxPage }, cities)
+//   } catch (error) {
+//     next(error)
+//   }
+// }
 
 // Se espera recibir: req.body = [{city}, {city}] || {city}
 const createCity = async (req, res, next) => {

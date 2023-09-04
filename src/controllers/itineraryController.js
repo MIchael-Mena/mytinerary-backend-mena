@@ -61,7 +61,13 @@ const createItinerary = async (req, res, next) => {
 
     const newItineraries = await Promise.all(itineraryPromises)
 
-    jsonResponse(true, res, 201, newItineraries)
+    jsonResponse(
+      true,
+      res,
+      201,
+      'Itineraries created successfully.',
+      newItineraries
+    )
   } catch (error) {
     next(error)
   }
