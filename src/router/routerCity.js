@@ -1,7 +1,7 @@
 import express from 'express'
 import {
   getCityById,
-  getCity,
+  getCities,
   createCity,
   updateCity,
   replaceCity,
@@ -14,7 +14,7 @@ import validateId from '../middleware/validateId.js'
 const routerCity = express.Router()
 
 routerCity.use('/city', [
-  express.Router().get('/', validateQueryParams, getCity),
+  express.Router().get('/', validateQueryParams, getCities),
   express.Router().get('/:id', validateId, getCityById),
   express.Router().post('/create', createCity),
   express.Router().patch('/update/:id', validateId, updateCity),

@@ -1,138 +1,60 @@
 import City from '../models/City.js'
 import Itinerary from '../models/Itinerary.js'
 import jsonResponse from '../utils/jsonResponse.js'
+import {
+  buildAggregationPipeline,
+  getNoCitiesMessage,
+  getQueryOptions,
+  getSortOptions,
+} from './util.js'
 
-const pagination = {
-  limit: 16, // Cambiar a 12 despues de actualizar front
-  page: 1,
+const populateItinerariesOption = {
+  path: 'itineraries',
+  populate: {
+    path: 'user',
+    select: 'name surname profilePic',
+  },
 }
 
-// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar
-const getCity = async (req, res, next) => {
+// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar&popItineraries=true
+// Version Alternativa con agregación, ventaja: se puede obtener el total de documentos sin necesidad de hacer un countDocuments
+const getCities = async (req, res, next) => {
   try {
-    const sortField = req.query.sort ? req.query.sort : 'updatedAt'
-    const sortOrder = req.query.order === 'desc' ? -1 : 1
+    const sortOptions = getSortOptions(req)
+    const { limit, page, query } = getQueryOptions(req)
 
-    const sortOptions = {
-      [sortField]: sortOrder, // Se puede agregar más de un criterio de ordenamiento
-    }
+    const aggregationPipeline = buildAggregationPipeline(
+      query,
+      sortOptions,
+      page,
+      limit
+    )
+    const [aggregationResult] = await City.aggregate(aggregationPipeline)
 
-    const limit = req.query.limit ? parseInt(req.query.limit) : pagination.limit // 0 = no limit
-    const page = req.query.page ? parseInt(req.query.page) : pagination.page // 1 = first page
-    let searchQuery = req.query.search
-      ? req.query.search.trim().toLowerCase()
-      : ''
-    let query = searchQuery
-      ? { name: { $regex: `^${searchQuery}`, $options: 'i' } } // Expresión regular de mongo
-      : {}
-    // const regex = new RegExp(`^${searchQuery}`, 'i') // Expresión regular de JS
-    // query = { name: regex }
+    const cities = aggregationResult.results
+    const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
 
-    const totalCitiesCount = await City.countDocuments(query)
-
-    const cities = await City.find(query)
-      // @ts-ignore
-      .sort(sortOptions)
-      .skip((page - 1) * limit) // Documentos a saltar
-      .limit(limit)
-      .populate({
-        path: 'itineraries',
-        populate: {
-          path: 'user',
-          select: 'name surname profilePic',
-        },
-      })
-
-    if (cities.length === 0)
+    if (cities.length === 0) {
       return jsonResponse(
         false,
         res,
         200,
-        searchQuery
-          ? `No cities found starting with '${searchQuery}'.`
-          : 'Cities not found.',
+        getNoCitiesMessage(req.query.search),
         cities
       )
+    }
+
+    if (req.query['pop-itineraries'] === 'true') {
+      await City.populate(cities, populateItinerariesOption)
+    }
 
     const maxPage = Math.ceil(totalCitiesCount / limit)
 
-    jsonResponse(true, res, 200, { maxPage: maxPage.toString() }, cities)
+    jsonResponse(true, res, 200, { maxPage }, cities)
   } catch (error) {
     next(error)
   }
 }
-
-// Version Alternativa con agregación, ventaja: se puede obtener el total de documentos sin necesidad de hacer un countDocuments
-// const getCity = async (req, res, next) => {
-//   try {
-//     const pagination = {
-//       limit: 9,
-//       page: 1,
-//     }
-
-//     const sortField = req.query.sort ? req.query.sort : 'updatedAt'
-//     const sortOrder = req.query.order === 'desc' ? -1 : 1
-
-//     const sortOptions = {
-//       [sortField]: sortOrder, // Se puede agregar más de un criterio de ordenamiento
-//     }
-
-//     const limit = req.query.limit ? parseInt(req.query.limit) : pagination.limit // 0 = no limit
-//     const page = req.query.page ? parseInt(req.query.page) : pagination.page // 1 = first page
-//     let searchQuery = req.query.search
-//       ? req.query.search.trim().toLowerCase()
-//       : ''
-//     let query = searchQuery
-//       ? { name: { $regex: `^${searchQuery}`, $options: 'i' } } // Expresión regular de mongo
-//       : {}
-
-//     const aggregationPipeline = [
-//       {
-//         $match: query,
-//       },
-//       {
-//         $sort: sortOptions,
-//       },
-//       {
-//         $facet: {
-//           results: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-//           totalCount: [{ $count: 'count' }],
-//         },
-//       },
-//     ]
-
-//     // @ts-ignore
-//     const [aggregationResult] = await City.aggregate(aggregationPipeline)
-
-//     const cities = aggregationResult.results
-//     const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
-
-//     if (cities.length === 0)
-//       return jsonResponse(
-//         false,
-//         res,
-//         200,
-//         searchQuery
-//           ? `No cities found starting with '${searchQuery}'.`
-//           : 'Cities not found.',
-//         cities
-//       )
-
-//     await City.populate(cities, {
-//       path: 'itineraries',
-//       populate: {
-//         path: 'user',
-//         select: 'name surname profilePic',
-//       },
-//     })
-
-//     const maxPage = Math.ceil(totalCitiesCount / limit)
-
-//     jsonResponse(true, res, 200, { maxPage }, cities)
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 
 // Se espera recibir: req.body = [{city}, {city}] || {city}
 const createCity = async (req, res, next) => {
@@ -146,13 +68,9 @@ const createCity = async (req, res, next) => {
 
 const getCityById = async (req, res, next) => {
   try {
-    const city = await City.findById(req.params.id).populate({
-      path: 'itineraries',
-      populate: {
-        path: 'user',
-        select: 'name surname profilePic',
-      },
-    })
+    const city = await City.findById(req.params.id).populate(
+      populateItinerariesOption
+    )
 
     if (!city) return jsonResponse(false, res, 404, 'City not found.')
     jsonResponse(true, res, 200, 'City retrieved successfully.', city)
@@ -165,11 +83,10 @@ const updateCityOrReplace = async (updateMethod, req, res, next) => {
   try {
     // El itinerario se puede actualizar en los endpoints de itinerario
     const cityData = req.body
-    const { itineraries } = cityData
-    if (itineraries) {
+    if (cityData.itineraries) {
       delete cityData.itineraries
     }
-    const city = await updateMethod({ _id: req.params.id }, itineraries, {
+    const city = await updateMethod({ _id: req.params.id }, cityData, {
       new: true, // devuelve el documento modificado
       runValidators: true, // ejecuta las validaciones del modelo
     })
@@ -243,7 +160,7 @@ const deleteItineraries = async (req, res, next) => {
 }
 
 export {
-  getCity,
+  getCities,
   getCityById,
   createCity,
   updateCity,

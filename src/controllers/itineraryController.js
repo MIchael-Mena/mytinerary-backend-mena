@@ -73,7 +73,33 @@ const createItinerary = async (req, res, next) => {
   }
 }
 
-const getItinerary = async (req, res, next) => {
+const getItinerariesByCityId = async (req, res, next) => {
+  try {
+    const itineraries = await Itinerary.find({ _city: req.params.id }).populate(
+      populateItinerary
+    )
+
+    if (itineraries.length === 0)
+      return jsonResponse(
+        false,
+        res,
+        404,
+        'There are no itineraries for this city.'
+      )
+
+    jsonResponse(
+      true,
+      res,
+      200,
+      'Itineraries retrieved successfully.',
+      itineraries
+    )
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getItineraryById = async (req, res, next) => {
   try {
     const itinerary = await Itinerary.findById(req.params.id).populate(
       populateItinerary
@@ -134,4 +160,10 @@ const updateItinerary = async (req, res, next) => {
   }
 }
 
-export { createItinerary, getItinerary, deleteItinerary, updateItinerary }
+export {
+  createItinerary,
+  getItineraryById,
+  deleteItinerary,
+  updateItinerary,
+  getItinerariesByCityId,
+}
