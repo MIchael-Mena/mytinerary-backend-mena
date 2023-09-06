@@ -15,7 +15,10 @@ const CitySchema = new Schema(
     religion: { type: String, required: true, maxlength: 100 },
     bestTime: { type: String, required: true, maxlength: 100 },
     timezone: { type: String, required: true, maxlength: 100 },
-    itineraries: [{ type: Types.ObjectId, ref: 'Itinerary' }],
+    itineraries: {
+      type: [{ type: Types.ObjectId, ref: 'Itinerary' }],
+      default: [],
+    },
   },
   { timestamps: true }
 )

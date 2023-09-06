@@ -44,13 +44,16 @@ const getCities = async (req, res, next) => {
       )
     }
 
-    if (req.query['pop-itineraries'] === 'true') {
+    if (req.query['popItineraries'] === 'true') {
       await City.populate(cities, populateItinerariesOption)
     }
 
-    const maxPage = Math.ceil(totalCitiesCount / limit)
+    const totalPages = Math.ceil(totalCitiesCount / limit)
 
-    jsonResponse(true, res, 200, { maxPage }, cities)
+    jsonResponse(true, res, 200, 'Cities retrieved successfully.', {
+      cities,
+      totalPages,
+    })
   } catch (error) {
     next(error)
   }
