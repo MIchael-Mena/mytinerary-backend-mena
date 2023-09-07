@@ -1,4 +1,5 @@
 // Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar
+// Version Alternativa con agregación, desventaja: hace uso de countDocuments
 // const getCity = async (req, res, next) => {
 // const pagination = {
 //   limit: 16, // Cambiar a 12 despues de actualizar front
@@ -56,57 +57,3 @@
 //     next(error)
 //   }
 // }
-
-const getPagination = (req) => {
-  const defaultPagination = { limit: 9, page: 1 }
-  const limit = req.query.limit
-    ? parseInt(req.query.limit)
-    : defaultPagination.limit
-  const page = req.query.page
-    ? parseInt(req.query.page)
-    : defaultPagination.page
-  return { limit, page }
-}
-
-const getSortOptions = (req) => {
-  const sortField = req.query.sort || 'updatedAt'
-  const sortOrder = req.query.order === 'desc' ? -1 : 1
-  return { [sortField]: sortOrder }
-}
-
-const getQueryOptions = (req) => {
-  const searchQuery = req.query.search
-    ? req.query.search.trim().toLowerCase()
-    : ''
-  const query = searchQuery
-    ? { name: { $regex: `^${searchQuery}`, $options: 'i' } }
-    : {}
-  return { ...getPagination(req), query }
-}
-
-const buildAggregationPipeline = (query, sortOptions, page, limit) => {
-  return [
-    { $match: query },
-    { $sort: sortOptions },
-    {
-      $facet: {
-        results: [{ $skip: (page - 1) * limit }, { $limit: limit }],
-        totalCount: [{ $count: 'count' }],
-      },
-    },
-  ]
-}
-
-const getNoCitiesMessage = (searchQuery) => {
-  return searchQuery
-    ? `No cities found starting with '${searchQuery}'.`
-    : 'Cities not found.'
-}
-
-export {
-  getPagination,
-  getSortOptions,
-  getQueryOptions,
-  buildAggregationPipeline,
-  getNoCitiesMessage,
-}
