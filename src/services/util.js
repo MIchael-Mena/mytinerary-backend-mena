@@ -1,9 +1,10 @@
 import { Types } from 'mongoose'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
 
-const validateId = (id) => {
+const validateId = (id, schemaName) => {
   if (!Types.ObjectId.isValid(id)) {
-    throw new InvalidFieldError('Id not valid.', 400)
+    // throw new InvalidFieldError(`${schemaName} with id '${id}' not found.`)
+    throw new InvalidFieldError(`Invalid ${schemaName} id '${id}'.`)
   }
 }
 

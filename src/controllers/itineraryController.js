@@ -1,72 +1,26 @@
-import Itinerary from '../models/Itinerary.js'
-import City from '../models/City.js'
 import jsonResponse from '../utils/jsonResponse.js'
-import User from '../models/User.js'
-import { Types } from 'mongoose'
+import {
+  createItinerariesService,
+  deleteItineraryService,
+  getItinerariesByCityIdService,
+  getItineraryByIdService,
+  updateItineraryService,
+} from '../services/itineraryService.js'
+import { updateCityService } from '../services/cityService.js'
 
-const populateItinerary = [
-  {
-    path: '_city',
-    select: 'name country',
-  },
-  {
-    path: 'user',
-    select: 'name surname profilePic',
-  },
-]
-
+// Puede resivir una lista de itinerarios o un solo itinerario
 const createItinerary = async (req, res, next) => {
   try {
     const itinerariesData = Array.isArray(req.body) ? req.body : [req.body]
 
-    const itineraryPromises = []
-
-    for (const itineraryData of itinerariesData) {
-      const { _city, user } = itineraryData
-
-      const cityIdIsValid = Types.ObjectId.isValid(_city)
-      const userIdIsValid = Types.ObjectId.isValid(user)
-      if (!cityIdIsValid || !userIdIsValid) {
-        return jsonResponse(
-          false,
-          res,
-          404,
-          cityIdIsValid
-            ? `User '${user}' not found`
-            : `City '${_city}' not found`
-        )
-      }
-
-      const cityExist = await City.findById(_city)
-      const userExist = await User.findById(user)
-
-      if (!cityExist || !userExist) {
-        return jsonResponse(
-          false,
-          res,
-          404,
-          cityExist ? `User '${user}' not found` : `City '${_city}' not found`
-        )
-      }
-
-      const newItinerary = await (
-        await Itinerary.create(itineraryData)
-      ).populate(populateItinerary)
-
-      cityExist.itineraries.push(newItinerary.id)
-      await cityExist.save()
-
-      itineraryPromises.push(newItinerary)
-    }
-
-    const newItineraries = await Promise.all(itineraryPromises)
+    const itineraries = await createItinerariesService(itinerariesData)
 
     jsonResponse(
       true,
       res,
       201,
       'Itineraries created successfully.',
-      newItineraries
+      itineraries
     )
   } catch (error) {
     next(error)
@@ -75,9 +29,7 @@ const createItinerary = async (req, res, next) => {
 
 const getItinerariesByCityId = async (req, res, next) => {
   try {
-    const itineraries = await Itinerary.find({ _city: req.params.id }).populate(
-      populateItinerary
-    )
+    const itineraries = await getItinerariesByCityIdService(req.params.id)
 
     if (itineraries.length === 0)
       return jsonResponse(
@@ -101,11 +53,7 @@ const getItinerariesByCityId = async (req, res, next) => {
 
 const getItineraryById = async (req, res, next) => {
   try {
-    const itinerary = await Itinerary.findById(req.params.id).populate(
-      populateItinerary
-    )
-
-    if (!itinerary) return jsonResponse(false, res, 404, 'Itinerary not found')
+    const itinerary = await getItineraryByIdService(req.params.id)
 
     jsonResponse(true, res, 200, 'Itinerary retrieved successfully.', itinerary)
   } catch (error) {
@@ -115,25 +63,11 @@ const getItineraryById = async (req, res, next) => {
 
 const deleteItinerary = async (req, res, next) => {
   try {
-    const itinerary = await Itinerary.findByIdAndDelete(req.params.id)
+    const itinerary = await deleteItineraryService(req.params.id)
 
-    if (!itinerary) return jsonResponse(false, res, 404, 'Itinerary not found')
-
-    const cityUpdated = await City.updateOne(
-      {
-        _id: itinerary._city,
-      },
-      { $pull: { itineraries: req.params.id } }
-    )
-
-    // Resultado de cityUpdated si se ha eliminado correctamente:
-    //     {
-    //   acknowledged: true,
-    //   modifiedCount: 1,
-    //   upsertedId: null,
-    //   upsertedCount: 0,
-    //   matchedCount: 1
-    // }
+    const city = await updateCityService(itinerary._city, {
+      $pull: { itineraries: req.params.id },
+    })
 
     jsonResponse(true, res, 200, 'Itinerary deleted successfully.')
   } catch (error) {
@@ -143,16 +77,7 @@ const deleteItinerary = async (req, res, next) => {
 
 const updateItinerary = async (req, res, next) => {
   try {
-    const itinerary = await Itinerary.findOneAndUpdate(
-      { _id: req.params.id },
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    ).populate(populateItinerary)
-
-    if (!itinerary) return jsonResponse(false, res, 404, 'Itinerary not found')
+    const itinerary = await updateItineraryService(req.params.id, req.body)
 
     jsonResponse(true, res, 200, 'Itinerary updated successfully.', itinerary)
   } catch (error) {

@@ -6,16 +6,15 @@ import {
   updateItinerary,
   getItinerariesByCityId,
 } from '../controllers/itineraryController.js'
-import validateId from '../middleware/validateId.js'
 
 const routerItinerary = express.Router()
 
 routerItinerary.use('/itinerary', [
-  express.Router().get('/:id', validateId, getItineraryById),
-  express.Router().get('/:cityId', validateId, getItinerariesByCityId),
+  express.Router().get('/:id', getItineraryById),
+  express.Router().get('/:cityId', getItinerariesByCityId),
   express.Router().post('/create', createItinerary),
-  express.Router().delete('/delete/:id', validateId, deleteItinerary),
-  express.Router().patch('/update/:id', validateId, updateItinerary),
+  express.Router().delete('/delete/:id', deleteItinerary),
+  express.Router().patch('/update/:id', updateItinerary),
 ])
 
 export default routerItinerary

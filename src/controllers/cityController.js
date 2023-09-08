@@ -1,13 +1,13 @@
 import jsonResponse from '../utils/jsonResponse.js'
 import {
-  deleteCity,
-  deleteItineraries,
-  getCityById,
-  updateCity,
-  getCitiesResults,
+  deleteCityService,
+  deleteItinerariesService,
+  getCityByIdService,
+  updateCityService,
+  getCitiesResultsService,
   getQueryOptions,
   getSortOptions,
-  createCity,
+  createCityService,
 } from '../services/cityService.js'
 
 const getCitiesNotFoundMessage = (searchQuery) => {
@@ -17,13 +17,13 @@ const getCitiesNotFoundMessage = (searchQuery) => {
 }
 
 // Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar&popItineraries=true
-const getCitiesController = async (req, res, next) => {
+const getCities = async (req, res, next) => {
   try {
     const sortOptions = getSortOptions(req.query)
     const { limit, page, queryToFind } = getQueryOptions(req.query)
     const popItineraries = req.query['popItineraries'] === 'true'
 
-    const { cities, totalPages } = await getCitiesResults(
+    const { cities, totalPages } = await getCitiesResultsService(
       queryToFind,
       sortOptions,
       page,
@@ -51,18 +51,18 @@ const getCitiesController = async (req, res, next) => {
 }
 
 // Se espera recibir: req.body = [{city}, {city}] || {city}
-const createCityController = async (req, res, next) => {
+const createCity = async (req, res, next) => {
   try {
-    const cities = await createCity(req.body)
+    const cities = await createCityService(req.body)
     jsonResponse(true, res, 201, 'Cities created successfully.', cities)
   } catch (error) {
     next(error)
   }
 }
 
-const getCityByIdController = async (req, res, next) => {
+const getCityById = async (req, res, next) => {
   try {
-    const cityFound = await getCityById(req.params.id)
+    const cityFound = await getCityByIdService(req.params.id)
 
     jsonResponse(true, res, 200, 'City retrieved successfully.', cityFound)
   } catch (error) {
@@ -70,9 +70,9 @@ const getCityByIdController = async (req, res, next) => {
   }
 }
 
-const updateCityController = async (req, res, next) => {
+const updateCity = async (req, res, next) => {
   try {
-    const cityUpdated = await updateCity(req.params.id, req.body)
+    const cityUpdated = await updateCityService(req.params.id, req.body)
 
     jsonResponse(true, res, 200, 'City updated successfully.', cityUpdated)
   } catch (error) {
@@ -80,10 +80,10 @@ const updateCityController = async (req, res, next) => {
   }
 }
 
-const deleteCityController = async (req, res, next) => {
+const deleteCity = async (req, res, next) => {
   try {
     const { id } = req.params
-    const result = await deleteCity(id)
+    const result = await deleteCityService(id)
 
     jsonResponse(true, res, 200, 'City deleted successfully.', result)
   } catch (error) {
@@ -91,10 +91,10 @@ const deleteCityController = async (req, res, next) => {
   }
 }
 
-const deleteItinerariesController = async (req, res, next) => {
+const deleteItineraries = async (req, res, next) => {
   try {
     const { cityId } = req.params
-    const city = await deleteItineraries(cityId)
+    const city = await deleteItinerariesService(cityId)
 
     city.itineraries = [] // Vaciamos el array de itinerarios, porque me devuelve los itinerarios que se han borrado
 
@@ -107,10 +107,10 @@ const deleteItinerariesController = async (req, res, next) => {
 }
 
 export {
-  getCitiesController,
-  createCityController,
-  getCityByIdController,
-  updateCityController,
-  deleteCityController,
-  deleteItinerariesController,
+  getCities as getCities,
+  createCity as createCity,
+  getCityById,
+  updateCity,
+  deleteCity,
+  deleteItineraries,
 }

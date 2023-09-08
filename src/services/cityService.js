@@ -50,7 +50,7 @@ const populateItineraries = async (cities, hasPopItinerariesParam) => {
   await City.populate(cities, populateCity)
 }
 
-const getCitiesResults = async (
+const getCitiesResultsService = async (
   queryToFind,
   sortOptions,
   page,
@@ -73,7 +73,7 @@ const getCitiesResults = async (
   return { cities, totalPages }
 }
 
-const getTotalCitiesCount = async (query) => {
+const getTotalCitiesCountService = async (query) => {
   const countResult = await City.aggregate([
     { $match: query },
     { $count: 'count' },
@@ -82,25 +82,26 @@ const getTotalCitiesCount = async (query) => {
   return totalCitiesCount
 }
 
-const deleteItineraries = async (cityId) => {
-  validateId(cityId)
+const deleteItinerariesService = async (cityId) => {
+  validateId(cityId, 'City')
   const city = await City.findById(cityId)
-  if (!city) throw new NotFoundError('City not found.', 404)
+  if (!city) throw new NotFoundError(`City with id '${cityId}' not found.`)
 
   const { itineraries } = city
 
   if (itineraries.length === 0)
-    throw new NotFoundError('There are no itineraries to delete.', 404)
+    throw new NotFoundError('There are no itineraries to delete for this city.')
 
   await Itinerary.deleteMany({ _id: { $in: itineraries } })
 
   return city
 }
 
-const deleteCity = async (cityId) => {
+const deleteCityService = async (cityId) => {
+  validateId(cityId, 'City')
   const city = await City.findByIdAndDelete(cityId)
   if (!city) {
-    throw new NotFoundError('City not found.', 404)
+    throw new NotFoundError(`City with id '${cityId}' not found.`)
   }
   // await city.deleteOne()
 
@@ -109,8 +110,8 @@ const deleteCity = async (cityId) => {
   return city
 }
 
-const updateCity = async (cityId, cityData) => {
-  validateId(cityId)
+const updateCityService = async (cityId, cityData) => {
+  validateId(cityId, 'City')
   // El itinerario se debe actualizar en los endpoints de itinerario
   if (cityData.itineraries) {
     delete cityData.itineraries
@@ -119,34 +120,55 @@ const updateCity = async (cityId, cityData) => {
     new: true,
     runValidators: true,
   })
+
+  // Como segundo parametro se puede pasar un objeto con las opciones de la query
+  // const cityUpdated = await City.updateOne(
+  //   {
+  //     _id: itinerary._city,
+  //   },
+  //   { $pull: { itineraries: req.params.id } }
+  // )
+
+  // Resultado de cityToUpdate en caso de exito (si no se usa la opcion {new: true}):
+  //     {
+  //   acknowledged: true,
+  //   modifiedCount: 1,
+  //   upsertedId: null,
+  //   upsertedCount: 0,
+  //   matchedCount: 1
+  // }
+
   if (!cityToUpdate) {
-    throw new NotFoundError('City not found.', 404)
+    throw new NotFoundError(`City with id '${cityId}' not found.`)
   }
   return cityToUpdate
 }
 
-const getCityById = async (cityId) => {
-  validateId(cityId)
-  const city = await City.findById(cityId).populate(populateCity)
-  if (!city) {
-    throw new NotFoundError('City not found.', 404)
-  }
+const getCityByIdService = async (cityId, shouldBePopulated = true) => {
+  validateId(cityId, 'City')
+  // const city = await City.findById(cityId).populate(populateCity)
+  const city = await City.findById(cityId)
+
+  if (!city) throw new NotFoundError(`City with id '${cityId}' not found.`)
+
+  if (shouldBePopulated) await city.populate(populateCity)
+
   return city
 }
 
-const createCity = async (cityData) => {
+const createCityService = async (cityData) => {
   const cities = await City.insertMany(cityData)
   return cities
 }
 
 export {
-  deleteItineraries,
-  deleteCity,
-  updateCity,
-  getCityById,
-  getCitiesResults,
-  getTotalCitiesCount,
+  deleteItinerariesService,
+  deleteCityService,
+  updateCityService,
+  getCityByIdService,
+  getCitiesResultsService,
+  getTotalCitiesCountService,
   getQueryOptions,
   getSortOptions,
-  createCity,
+  createCityService,
 }
