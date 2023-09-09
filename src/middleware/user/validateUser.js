@@ -40,6 +40,9 @@ const userDetailSchema = userLoginSchema.keys({
     'date.base': 'Birth date must be a valid date',
     'any.required': 'Birth date is a required field',
   }),
+  profilePic: Joi.string().default('').messages({
+    'any.only': 'Profile pic must be a string',
+  }),
   role: Joi.string().valid('admin', 'user').default('user').messages({
     'any.only': 'Role must be admin or user',
   }),
@@ -62,17 +65,19 @@ const validateUserRegister = async (req, res, next) => {
   const userValidation = userDetailSchema.validate(payload, {
     abortEarly: false,
     dateFormat: 'date',
-    stripUnknown: true,
   })
 
-  if (userValidation.error) {
+  if (userValidation.error)
     return jsonResponse(
       false,
       res,
       400,
       userValidation.error.details.map((error) => error.message)
     )
-  }
+
+  // Reemplaza el body por el validado que incluye los valores por defecto
+  req.body = userValidation.value
+
   next()
 }
 const validateUserLogin = async (req, res, next) => {
@@ -81,14 +86,14 @@ const validateUserLogin = async (req, res, next) => {
     abortEarly: false,
     stripUnknown: true,
   })
-  if (userValidation.error) {
+  if (userValidation.error)
     return jsonResponse(
       false,
       res,
       400,
       userValidation.error.details.map((error) => error.message)
     )
-  }
+
   next()
 }
 
