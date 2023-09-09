@@ -1,13 +1,18 @@
 import express from 'express'
 import { login, register } from '../controllers/authController.js'
-import { verifyUserData } from '../middleware/verifications.js'
 import { hashPassword } from '../middleware/auth.js'
+import {
+  validateUserLogin,
+  validateUserRegister,
+} from '../middleware/user/validateUser.js'
 
-const routerUser = express.Router()
+const routerAuth = express.Router()
 
-routerUser.use('/user', [
-  express.Router().post('/register', verifyUserData, hashPassword, register),
-  express.Router().post('/login', verifyUserData, login),
+routerAuth.use('/user', [
+  express
+    .Router()
+    .post('/register', validateUserRegister, hashPassword, register),
+  express.Router().post('/login', validateUserLogin, login),
 ])
 
-export default routerUser
+export default routerAuth

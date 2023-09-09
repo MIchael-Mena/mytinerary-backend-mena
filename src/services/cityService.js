@@ -70,7 +70,7 @@ const getCitiesResultsService = async (
   const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
   const totalPages = Math.ceil(totalCitiesCount / limit)
 
-  return { cities, totalPages }
+  return { cities, totalPages, totalCitiesCount }
 }
 
 const getTotalCitiesCountService = async (query) => {
@@ -100,9 +100,9 @@ const deleteItinerariesService = async (cityId) => {
 const deleteCityService = async (cityId) => {
   validateId(cityId, 'City')
   const city = await City.findByIdAndDelete(cityId)
-  if (!city) {
-    throw new NotFoundError(`City with id '${cityId}' not found.`)
-  }
+
+  if (!city) throw new NotFoundError(`City with id '${cityId}' not found.`)
+
   // await city.deleteOne()
 
   await Itinerary.deleteMany({ _city: city._id })
@@ -112,10 +112,9 @@ const deleteCityService = async (cityId) => {
 
 const updateCityService = async (cityId, cityData) => {
   validateId(cityId, 'City')
-  // El itinerario se debe actualizar en los endpoints de itinerario
-  if (cityData.itineraries) {
-    delete cityData.itineraries
-  }
+
+  if (cityData.itineraries) delete cityData.itineraries
+
   const cityToUpdate = await City.findByIdAndUpdate(cityId, cityData, {
     new: true,
     runValidators: true,

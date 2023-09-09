@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs'
-import jsonResponse from '../utils/jsonResponse'
+import bcrypt from 'bcrypt'
+import jsonResponse from '../utils/jsonResponse.js'
 
 const hashPassword = (req, res, next) => {
   try {

@@ -18,9 +18,9 @@ const populateItinerary = [
 const deleteItineraryService = async (id) => {
   validateId(id, 'Itinerary')
   const itinerary = await Itinerary.findByIdAndDelete(id)
-  if (!itinerary) {
+  if (!itinerary)
     throw new NotFoundError(`Itinerary with id '${id}' not found.`)
-  }
+
   return itinerary
 }
 
@@ -31,9 +31,9 @@ const updateItineraryService = async (id, itinerary) => {
     runValidators: true,
   })
 
-  if (!itineraryUpdated) {
+  if (!itineraryUpdated)
     throw new NotFoundError(`Itinerary with id '${id}' not found.`)
-  }
+
   return itineraryUpdated
 }
 
@@ -41,9 +41,9 @@ const getItineraryByIdService = async (id) => {
   validateId(id, 'Itinerary')
   const itinerary = await Itinerary.findById(id).populate(populateItinerary)
 
-  if (!itinerary) {
+  if (!itinerary)
     throw new NotFoundError(`Itinerary with id '${id}' not found.`)
-  }
+
   return itinerary
 }
 

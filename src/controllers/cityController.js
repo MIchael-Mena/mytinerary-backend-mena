@@ -23,13 +23,14 @@ const getCities = async (req, res, next) => {
     const { limit, page, queryToFind } = getQueryOptions(req.query)
     const popItineraries = req.query['popItineraries'] === 'true'
 
-    const { cities, totalPages } = await getCitiesResultsService(
-      queryToFind,
-      sortOptions,
-      page,
-      limit,
-      popItineraries
-    )
+    const { cities, totalPages, totalCitiesCount } =
+      await getCitiesResultsService(
+        queryToFind,
+        sortOptions,
+        page,
+        limit,
+        popItineraries
+      )
 
     const hasCities = cities.length > 0
 
@@ -41,8 +42,9 @@ const getCities = async (req, res, next) => {
         ? getCitiesNotFoundMessage(req.query.search)
         : 'Cities retrieved successfully.',
       {
-        cities,
         totalPages,
+        totalCitiesCount,
+        cities,
       }
     )
   } catch (error) {

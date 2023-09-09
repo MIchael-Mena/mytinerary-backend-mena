@@ -8,19 +8,17 @@ import {
   updateCity,
 } from '../controllers/cityController.js'
 import validateQueryParams from '../middleware/city/validateQueryParams.js'
-import validateId from '../middleware/validateId.js'
+import validateCityData from '../middleware/city/validateCityData.js'
 
 const routerCity = express.Router()
 
 routerCity.use('/city', [
   express.Router().get('/', validateQueryParams, getCities),
-  express.Router().post('/create', createCity),
   express.Router().get('/:id', getCityById),
-  express.Router().patch('/:id', updateCity),
-  express.Router().delete('/:id', deleteCity),
-  express
-    .Router()
-    .delete('/delete-itineraries/:cityId', validateId, deleteItineraries),
+  express.Router().post('/create', createCity),
+  express.Router().patch('/update/:id', validateCityData, updateCity),
+  express.Router().delete('/delete/:id', deleteCity),
+  express.Router().delete('/delete-itineraries/:cityId', deleteItineraries),
 ])
 
 export default routerCity
