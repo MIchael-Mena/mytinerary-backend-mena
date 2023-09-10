@@ -1,4 +1,11 @@
-const jsonResponse = (success, res, status, message, data = null) => {
+const jsonResponse = (
+  success,
+  res,
+  status,
+  message,
+  data = null,
+  token = null
+) => {
   const now = new Date()
   const options = {
     month: '2-digit',
@@ -16,7 +23,8 @@ const jsonResponse = (success, res, status, message, data = null) => {
   return res.status(status).json({
     success,
     message,
-    data,
+    ...(token !== null && { token }),
+    ...(data !== null && { data }),
     timestamp: formattedDate,
   })
 }

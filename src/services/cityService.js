@@ -85,7 +85,7 @@ const getTotalCitiesCountService = async (query) => {
 const deleteItinerariesService = async (cityId) => {
   validateId(cityId, 'City')
   const city = await City.findById(cityId)
-  if (!city) throw new NotFoundError(`City with id '${cityId}' not found.`)
+  verifyCityExists(city, cityId)
 
   const { itineraries } = city
 
@@ -100,8 +100,7 @@ const deleteItinerariesService = async (cityId) => {
 const deleteCityService = async (cityId) => {
   validateId(cityId, 'City')
   const city = await City.findByIdAndDelete(cityId)
-
-  if (!city) throw new NotFoundError(`City with id '${cityId}' not found.`)
+  verifyCityExists(city, cityId)
 
   // await city.deleteOne()
 
@@ -113,12 +112,12 @@ const deleteCityService = async (cityId) => {
 const updateCityService = async (cityId, cityData) => {
   validateId(cityId, 'City')
 
-  if (cityData.itineraries) delete cityData.itineraries
-
   const cityToUpdate = await City.findByIdAndUpdate(cityId, cityData, {
     new: true,
     runValidators: true,
   })
+
+  verifyCityExists(cityToUpdate, cityId)
 
   // Como segundo parametro se puede pasar un objeto con las opciones de la query
   // const cityUpdated = await City.updateOne(
@@ -137,9 +136,6 @@ const updateCityService = async (cityId, cityData) => {
   //   matchedCount: 1
   // }
 
-  if (!cityToUpdate) {
-    throw new NotFoundError(`City with id '${cityId}' not found.`)
-  }
   return cityToUpdate
 }
 
@@ -147,8 +143,7 @@ const getCityByIdService = async (cityId, shouldBePopulated = true) => {
   validateId(cityId, 'City')
   // const city = await City.findById(cityId).populate(populateCity)
   const city = await City.findById(cityId)
-
-  if (!city) throw new NotFoundError(`City with id '${cityId}' not found.`)
+  verifyCityExists(city, cityId)
 
   if (shouldBePopulated) await city.populate(populateCity)
 
@@ -158,6 +153,10 @@ const getCityByIdService = async (cityId, shouldBePopulated = true) => {
 const createCityService = async (cityData) => {
   const cities = await City.insertMany(cityData)
   return cities
+}
+
+const verifyCityExists = (city, cityID) => {
+  if (!city) throw new NotFoundError(`City with id '${cityID}' not found.`)
 }
 
 export {

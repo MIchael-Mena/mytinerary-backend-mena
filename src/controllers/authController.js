@@ -1,18 +1,27 @@
-import { verifiyPassword } from '../middleware/auth.js'
 import User from '../models/User.js'
 import jsonResponse from '../utils/jsonResponse.js'
+
+const getUserResponse = (user) => {
+  return {
+    id: user._id,
+    name: user.name,
+    surname: user.surname,
+    email: user.email,
+    profilePic: user.profilePic,
+    lastLogin: user.lastLogin,
+    favouriteCities: user.favouriteCities,
+    favouriteActivities: user.favouriteActivities,
+    favouriteItineraries: user.favouriteItineraries,
+  }
+}
 
 const register = async (req, res, next) => {
   try {
     const payload = req.body
-    const useExists = await User.findOne({ email: payload.email })
-    if (useExists) {
-      return jsonResponse(false, res, 403, 'User already exists')
-    }
+
     const user = new User(payload)
     await user.save()
-    const { password, ...response } = user.toObject()
-    jsonResponse(true, res, 201, 'User created', response)
+    jsonResponse(true, res, 201, 'User created', getUserResponse(user))
   } catch (error) {
     next(error)
   }
@@ -20,16 +29,19 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body
-    const userFounded = await User.findOne({ email })
-    if (!userFounded) {
-      return jsonResponse(false, res, 400, 'User not found')
-    }
-    if (!verifiyPassword(password, userFounded.password)) {
-      return jsonResponse(false, res, 400, 'Password not valid')
-    }
+    const user = await User.findOneAndUpdate(
+      { email: req.body.email },
+      { $set: { lastLogin: Date.now() } }
+    )
 
-    jsonResponse(true, res, 200, 'User logged')
+    jsonResponse(
+      true,
+      res,
+      200,
+      'User logged',
+      getUserResponse(user),
+      req.token
+    )
   } catch (error) {
     next(error)
   }

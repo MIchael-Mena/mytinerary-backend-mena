@@ -17,6 +17,8 @@ const UserSchema = new Schema(
     favouriteItineraries: [String],
     role: String,
     active: Boolean,
+    online: Boolean,
+    lastLogin: Date,
   },
   {
     timestamps: true,

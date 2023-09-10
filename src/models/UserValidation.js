@@ -1,5 +1,4 @@
 import Joi from 'joi'
-import jsonResponse from '../../utils/jsonResponse.js'
 import JoiDate from '@joi/date'
 
 const JoiWithDate = Joi.extend(JoiDate)
@@ -49,6 +48,13 @@ const userDetailSchema = userLoginSchema.keys({
   active: Joi.boolean().default(true).messages({
     'any.only': 'Active must be true or false',
   }),
+  online: Joi.boolean().default(false).messages({
+    'any.only': 'Online must be true or false',
+  }),
+  lastLogin: JoiWithDate.date().format('YYYY-MM-DD').default(null).messages({
+    'date.format': 'Last login must be in format YYYY-MM-DD',
+    'date.base': 'Last login must be a valid date',
+  }),
   favouriteCities: Joi.array().items(Joi.string()).default([]).messages({
     'any.only': 'Favourite cities must be an array of strings',
   }),
@@ -60,41 +66,4 @@ const userDetailSchema = userLoginSchema.keys({
   }),
 })
 
-const validateUserRegister = async (req, res, next) => {
-  const payload = req.body
-  const userValidation = userDetailSchema.validate(payload, {
-    abortEarly: false,
-    dateFormat: 'date',
-  })
-
-  if (userValidation.error)
-    return jsonResponse(
-      false,
-      res,
-      400,
-      userValidation.error.details.map((error) => error.message)
-    )
-
-  // Reemplaza el body por el validado que incluye los valores por defecto
-  req.body = userValidation.value
-
-  next()
-}
-const validateUserLogin = async (req, res, next) => {
-  const payload = req.body
-  const userValidation = userLoginSchema.validate(payload, {
-    abortEarly: false,
-    stripUnknown: true,
-  })
-  if (userValidation.error)
-    return jsonResponse(
-      false,
-      res,
-      400,
-      userValidation.error.details.map((error) => error.message)
-    )
-
-  next()
-}
-
-export { validateUserRegister, validateUserLogin }
+export { userLoginSchema, userDetailSchema }
