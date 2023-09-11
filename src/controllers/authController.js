@@ -1,27 +1,16 @@
-import User from '../models/User.js'
+import {
+  createUserService,
+  deleteAccountService,
+  getUserResponse,
+  updateLoginStatusService,
+} from '../services/userService.js'
 import jsonResponse from '../utils/jsonResponse.js'
-
-const getUserResponse = (user) => {
-  return {
-    id: user._id,
-    name: user.name,
-    surname: user.surname,
-    email: user.email,
-    profilePic: user.profilePic,
-    lastLogin: user.lastLogin,
-    favouriteCities: user.favouriteCities,
-    favouriteActivities: user.favouriteActivities,
-    favouriteItineraries: user.favouriteItineraries,
-  }
-}
 
 const register = async (req, res, next) => {
   try {
-    const payload = req.body
+    const user = await createUserService(req.body)
 
-    const user = new User(payload)
-    await user.save()
-    jsonResponse(true, res, 201, 'User created', getUserResponse(user))
+    jsonResponse(true, res, 201, 'User created', user)
   } catch (error) {
     next(error)
   }
@@ -29,17 +18,14 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const user = await User.findOneAndUpdate(
-      { email: req.body.email },
-      { $set: { lastLogin: Date.now() } }
-    )
+    await updateLoginStatusService(req.user.email, true)
 
     jsonResponse(
       true,
       res,
       200,
       'User logged',
-      getUserResponse(user),
+      getUserResponse(req.user),
       req.token
     )
   } catch (error) {
@@ -47,4 +33,43 @@ const login = async (req, res, next) => {
   }
 }
 
-export { register, login }
+const logout = async (req, res, next) => {
+  try {
+    await updateLoginStatusService(req.user.email, false)
+    jsonResponse(true, res, 200, 'User logged out')
+  } catch (error) {
+    next(error)
+  }
+}
+
+const authenticate = async (req, res, next) => {
+  try {
+    jsonResponse(
+      true,
+      res,
+      200,
+      'User authenticated',
+      getUserResponse(req.user),
+      req.token
+    )
+  } catch (error) {
+    next(error)
+  }
+}
+
+const deleteAccount = async (req, res, next) => {
+  try {
+    deleteAccountService(req.user._id)
+    jsonResponse(
+      true,
+      res,
+      200,
+      'User deleted successfully',
+      getUserResponse(req.user)
+    )
+  } catch (error) {
+    next(error)
+  }
+}
+
+export { register, login, authenticate, logout, deleteAccount }

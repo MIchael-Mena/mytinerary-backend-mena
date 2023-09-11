@@ -1,14 +1,24 @@
-import { getUserDetailService } from '../services/userService.js'
-import jsonResponse from '../utils/jsonResponse.js'
-
-const getUserDetail = async (req, res, next) => {
+const getActiveUsers = async (req, res, next) => {
   try {
-    const user = await getUserDetailService(req.params.id)
-
-    jsonResponse(true, res, 200, 'User found', user)
+    // const users = await getActiveUsersService()
+    // jsonResponse(true, res, 200, 'Users retrieved successfully.', users)
   } catch (error) {
     next(error)
   }
 }
 
-export { getUserDetail }
+const getInactiveUsers = async (req, res, next) => {}
+
+const getOnlineUsers = async (req, res, next) => {}
+
+const getOfflineUsers = async (req, res, next) => {}
+
+const getUserById = async (req, res, next) => {}
+
+export {
+  getActiveUsers,
+  getInactiveUsers,
+  getOnlineUsers,
+  getOfflineUsers,
+  getUserById,
+}

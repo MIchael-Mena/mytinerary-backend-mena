@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt'
 import jsonResponse from '../utils/jsonResponse.js'
-import User from '../models/User.js'
 import { userDetailSchema, userLoginSchema } from '../models/UserValidation.js'
-import jbt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+import { getUserByEmailService } from '../services/userService.js'
+import { Strategy, ExtractJwt } from 'passport-jwt'
+import passport from 'passport'
 
 const validateUserDataRegister = async (req, res, next) => {
   const payload = req.body
@@ -55,20 +57,21 @@ const hashPassword = (req, res, next) => {
 }
 
 const verifyUserAlreadyExists = async (req, res, next) => {
-  const { email } = req.body
-  const userExists = await User.findOne({ email })
-  if (userExists) return jsonResponse(false, res, 403, 'User already exists')
-
-  next()
+  try {
+    await getUserByEmailService(req.body.email) // Da un error si no existe el usuario
+    return jsonResponse(false, res, 403, 'User already exists')
+  } catch (error) {
+    next()
+  }
 }
 
 const verifyUserExists = async (req, res, next) => {
-  const { email } = req.body
-  const userExist = await User.findOne({ email })
-  if (!userExist) return jsonResponse(false, res, 404, 'User not found')
-
-  req.user = userExist
-  next()
+  try {
+    req.user = await getUserByEmailService(req.body.email)
+    next()
+  } catch (error) {
+    return jsonResponse(false, res, error.status, error.message)
+  }
 }
 
 const verifiyPassword = (req, res, next) => {
@@ -82,13 +85,33 @@ const verifiyPassword = (req, res, next) => {
   next()
 }
 
+// TODO: el body contiene los datos que el usuario completó en el formulario de login
 const generateToken = (req, res, next) => {
-  const token = jbt.sign({ email: req.body.email }, process.env.SECRET_KEY, {
-    expiresIn: '1h',
+  req.token = jwt.sign({ email: req.user.email }, process.env.SECRET_KEY, {
+    expiresIn: process.env.TOKEN_EXPIRES_IN,
   })
-  req.token = token
   next()
 }
+
+const passportJwtAuthentication = passport.use(
+  new Strategy(
+    {
+      secretOrKey: process.env.SECRET_KEY,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // Si el token fue modificado, o no existe, o no es válido, o el secret es invalido, no se ejecuta el callback
+    },
+    async (payload, done) => {
+      try {
+        const user = await getUserByEmailService(payload.email)
+        if (!user.online || !user.active) return done(null, false)
+        return done(null, user) // Con esto passport guarda el usuario en req.user
+      } catch (error) {
+        // return done(error instanceof NotFoundError ? null : error)
+        return done(error)
+      }
+    }
+  )
+)
 
 export {
   hashPassword,
@@ -98,4 +121,5 @@ export {
   verifyUserExists,
   generateToken,
   verifyUserAlreadyExists,
+  passportJwtAuthentication,
 }
