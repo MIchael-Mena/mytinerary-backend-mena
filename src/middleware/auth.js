@@ -79,8 +79,15 @@ const verifiyPassword = (req, res, next) => {
   const hashPassword = req.user.password
   const isPasswordValid = bcrypt.compareSync(passwordPlain, hashPassword)
 
-  if (!isPasswordValid)
+  if (!isPasswordValid) {
+    // return jsonResponse(
+    //   false,
+    //   res,
+    //   404,
+    //   `User with email '${req.body.email}' not found`
+    //   )
     return jsonResponse(false, res, 400, 'Password not valid')
+  }
 
   next()
 }
