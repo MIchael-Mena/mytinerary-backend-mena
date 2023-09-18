@@ -7,8 +7,8 @@ const getUserResponse = (user) => {
     id: user._id,
     // lastLogin: user.lastLogin,
     email: user.email,
-    name: user.name,
-    surname: user.surname,
+    firstName: user.firstName,
+    lastName: user.lastName,
     profilePic: user.profilePic,
     favouriteCities: user.favouriteCities,
     favouriteActivities: user.favouriteActivities,
@@ -16,34 +16,44 @@ const getUserResponse = (user) => {
   }
 }
 
+const verifyUserIsActive = (id, user, idText = 'id') => {
+  // if (!user || !user.active) {
+  //   throw new NotFoundError(
+  //     `User with ${idText} '${id}' not found or inactive.`
+  //   )
+  // }
+  if (!user) throw new NotFoundError(`User with ${idText} '${id}' not found.`)
+
+  if (user && !user.active)
+    throw new NotFoundError(`User with ${idText} '${id}' is inactive.`)
+}
+
 // Metodo usado internamente
 const getUserByIdService = async (id) => {
   validateId(id, 'User')
   const user = await User.findById(id)
-
-  if (!user) throw new NotFoundError(`User with id '${id}' not found.`)
+  verifyUserIsActive(id, user)
 
   return user
 }
 
 const getUserByEmailService = async (email) => {
   const user = await User.findOne({ email })
-
-  if (!user || !user.active)
-    throw new NotFoundError(`User with email '${email}' not found.`)
+  verifyUserIsActive(email, user, 'email')
 
   return user
 }
 
-const updateLoginStatusService = async (email, loginIsActive) => {
+// @param loginState: true si se loguea, false si se desloguea
+const updateLoginStatusService = async (email, loginState) => {
   const user = await User.updateOne(
     { email },
-    loginIsActive
+    loginState
       ? { $set: { lastLogin: Date.now(), online: true } }
       : { $set: { online: false } }
   )
-  // TODO: Lanzar excepción si no se ha modificado ningún usuario
-  return user.modifiedCount > 0 ? true : false
+  if (user.modifiedCount === 0)
+    throw new Error(`User with email '${email}' not modified.`)
 }
 
 const createUserService = async (payload) => {
@@ -53,12 +63,12 @@ const createUserService = async (payload) => {
 }
 
 const deleteAccountService = async (id) => {
+  validateId(id, 'User')
   const user = await User.findByIdAndUpdate(id, {
     active: false,
     online: false,
   })
-  if (!user) throw new NotFoundError(`User with id '${id}' not found.`)
-  return user
+  verifyUserIsActive(id, user)
 }
 
 export {

@@ -10,7 +10,14 @@ const register = async (req, res, next) => {
   try {
     const user = await createUserService(req.body)
 
-    jsonResponse(true, res, 201, 'User created', user)
+    jsonResponse(
+      true,
+      res,
+      201,
+      'User registered successfully',
+      getUserResponse(user),
+      req.token ?? null
+    )
   } catch (error) {
     next(error)
   }

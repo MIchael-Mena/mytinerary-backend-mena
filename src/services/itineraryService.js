@@ -4,6 +4,8 @@ import { getCityByIdService } from './cityService.js'
 import { getUserByIdService } from './userService.js'
 import { validateId } from './util.js'
 
+// TODO: revisar que si se cambia el nombre de una propiedad en el modelo, se cambie también en el populate
+// tal vez se pueda hacer un populate dinámico con un objeto que tenga como clave el nombre de la propiedad
 const populateItinerary = [
   {
     path: '_city',
@@ -11,15 +13,19 @@ const populateItinerary = [
   },
   {
     path: 'user',
-    select: 'name surname profilePic',
+    select: 'firstName lastName profilePic',
   },
 ]
+
+const verifyItineraryExists = (id, itinerary) => {
+  if (!itinerary)
+    throw new NotFoundError(`Itinerary with id '${id}' not found.`)
+}
 
 const deleteItineraryService = async (id) => {
   validateId(id, 'Itinerary')
   const itinerary = await Itinerary.findByIdAndDelete(id)
-  if (!itinerary)
-    throw new NotFoundError(`Itinerary with id '${id}' not found.`)
+  verifyItineraryExists(id, itinerary)
 
   return itinerary
 }
@@ -30,9 +36,7 @@ const updateItineraryService = async (id, itinerary) => {
     new: true,
     runValidators: true,
   })
-
-  if (!itineraryUpdated)
-    throw new NotFoundError(`Itinerary with id '${id}' not found.`)
+  verifyItineraryExists(id, itineraryUpdated)
 
   return itineraryUpdated
 }
@@ -41,8 +45,7 @@ const getItineraryByIdService = async (id) => {
   validateId(id, 'Itinerary')
   const itinerary = await Itinerary.findById(id).populate(populateItinerary)
 
-  if (!itinerary)
-    throw new NotFoundError(`Itinerary with id '${id}' not found.`)
+  verifyItineraryExists(id, itinerary)
 
   return itinerary
 }

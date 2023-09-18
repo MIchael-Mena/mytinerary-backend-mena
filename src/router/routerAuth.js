@@ -11,11 +11,12 @@ import {
   verifiyPassword,
   validateUserDataLogin,
   validateUserDataRegister,
-  verifyUserExists,
+  checkUserExists,
   generateToken,
-  verifyUserAlreadyExists,
+  checkEmailDuplicate,
   passportJwtAuthentication,
 } from '../middleware/auth.js'
+import { validateGoogleAuthCode } from '../middleware/authGoogle.js'
 
 const routerAuth = express.Router()
 
@@ -25,7 +26,7 @@ routerAuth.use('/user', [
     .post(
       '/register',
       validateUserDataRegister,
-      verifyUserAlreadyExists,
+      checkEmailDuplicate,
       hashPassword,
       register
     ),
@@ -34,7 +35,7 @@ routerAuth.use('/user', [
     .post(
       '/login',
       validateUserDataLogin,
-      verifyUserExists,
+      checkUserExists,
       verifiyPassword,
       generateToken,
       login
@@ -58,6 +59,26 @@ routerAuth.use('/user', [
       '/delete-account',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
       deleteAccount
+    ),
+  express
+    .Router()
+    .post(
+      '/register-google',
+      validateGoogleAuthCode,
+      checkEmailDuplicate,
+      hashPassword,
+      generateToken,
+      register
+    ),
+  express
+    .Router()
+    .post(
+      '/login-google',
+      validateGoogleAuthCode,
+      checkUserExists,
+      verifiyPassword,
+      generateToken,
+      login
     ),
 ])
 

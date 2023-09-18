@@ -10,7 +10,7 @@ const errorHandler = (error, req, res, next) => {
     error instanceof NotFoundError ||
     error instanceof InvalidFieldError
   ) {
-    return jsonResponse(false, res, error.statusCode, error.message)
+    return jsonResponse(false, res, error.status, error.message)
   } else {
     return jsonResponse(false, res, 500, error.message)
   }

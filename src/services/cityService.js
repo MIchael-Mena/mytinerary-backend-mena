@@ -7,7 +7,7 @@ const populateCity = {
   path: 'itineraries',
   populate: {
     path: 'user',
-    select: 'name surname profilePic',
+    select: 'firstName lastName profilePic',
   },
 }
 

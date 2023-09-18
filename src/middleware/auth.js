@@ -50,27 +50,28 @@ const hashPassword = (req, res, next) => {
     const hashPassword = bcrypt.hashSync(passwordPlain, 10)
 
     req.body.password = hashPassword
+
     next()
   } catch (error) {
     jsonResponse(false, res, 500, 'Error hashing password')
   }
 }
 
-const verifyUserAlreadyExists = async (req, res, next) => {
+const checkEmailDuplicate = async (req, res, next) => {
   try {
-    await getUserByEmailService(req.body.email) // Da un error si no existe el usuario
-    return jsonResponse(false, res, 403, 'User already exists')
+    await getUserByEmailService(req.body.email) // Da un error si no existe el email
+    return jsonResponse(false, res, 403, 'Email already exists')
   } catch (error) {
     next()
   }
 }
 
-const verifyUserExists = async (req, res, next) => {
+const checkUserExists = async (req, res, next) => {
   try {
     req.user = await getUserByEmailService(req.body.email)
     next()
   } catch (error) {
-    return jsonResponse(false, res, error.status, error.message)
+    return jsonResponse(false, res, 404, `User not found`)
   }
 }
 
@@ -94,10 +95,15 @@ const verifiyPassword = (req, res, next) => {
 
 // TODO: el body contiene los datos que el usuario completó en el formulario de login
 const generateToken = (req, res, next) => {
-  req.token = jwt.sign({ email: req.user.email }, process.env.SECRET_KEY, {
-    expiresIn: process.env.TOKEN_EXPIRES_IN,
-  })
-  next()
+  try {
+    const email = req.user ? req.user.email : req.body ? req.body.email : null
+    req.token = jwt.sign({ email: email }, process.env.SECRET_KEY, {
+      expiresIn: process.env.TOKEN_EXPIRES_IN,
+    })
+    next()
+  } catch (error) {
+    return jsonResponse(false, res, 500, 'Error generating token')
+  }
 }
 
 const passportJwtAuthentication = passport.use(
@@ -125,8 +131,8 @@ export {
   verifiyPassword,
   validateUserDataRegister,
   validateUserDataLogin,
-  verifyUserExists,
+  checkUserExists,
   generateToken,
-  verifyUserAlreadyExists,
+  checkEmailDuplicate,
   passportJwtAuthentication,
 }
