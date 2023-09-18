@@ -33,12 +33,12 @@ const getUserFromGoogleCode = async (code) => {
   return response
   // Ejemplo de respuesta
   //   {
-  //   sub: '118149344821360194332', // id del usuario de google que se puede usar para identificarlo en la base de datos
-  //   name: 'Michael Mena',
-  //   given_name: 'Michael',
-  //   family_name: 'Mena',
-  //   picture: 'https://lh3.googleusercontent.com/a/ACg8ocKXRDIjwA4CMhLJXa1xXfmjznO_jpjY2Mv0V5BqGe9a=s96-c',
-  //   email: 'tsiow2013@gmail.com',
+  //   sub: '1234567891234567891234', // 22 numeros id del usuario de google que se puede usar para identificarlo en la base de datos
+  //   name: 'M M',
+  //   given_name: 'M',
+  //   family_name: 'M',
+  //   picture: 'picture.jpg',
+  //   email: 'mimail@gmail.com',
   //   email_verified: true,
   //   locale: 'es'
   // }
