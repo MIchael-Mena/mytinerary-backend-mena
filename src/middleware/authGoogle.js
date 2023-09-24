@@ -63,7 +63,7 @@ const verify = async (code) => {
 }
 
 const generateBasicUser = (payload) => {
-  // EL password supurara los 20 caracteres, pero no importa porque no se usa
+  // EL password tendra mas de 20 caracteres, pero no importa porque no se usa
   // en este caso el usuario se loguea con google, no con email y password
   const user = {
     password: payload.sub + process.env.SECRET_PASSWORD,
@@ -87,7 +87,8 @@ const generateBasicUser = (payload) => {
 const validateGoogleAuthCode = async (req, res, next) => {
   try {
     const code = req.body.code
-    if (!code) return jsonResponse(false, res, 400, 'Code is required')
+    if (!code)
+      return jsonResponse(false, res, 400, 'Authorization code is required')
 
     const payload = await getUserFromGoogleCode(code)
 
@@ -103,7 +104,13 @@ const validateGoogleAuthCode = async (req, res, next) => {
 
     next()
   } catch (error) {
-    return jsonResponse(false, res, 400, 'Invalid code')
+    // El codigo de autorización de google es de un solo uso, si se usa una segunda vez, se obtiene este error
+    return jsonResponse(
+      false,
+      res,
+      400,
+      'The Google authorization code is incorrect or has already been used.'
+    )
   }
 }
 
