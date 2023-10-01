@@ -28,19 +28,19 @@ const userLoginSchema = Joi.object().keys({
 
 // Incluye las validaciones de userLoginSchema
 const userDetailSchema = userLoginSchema.keys({
-  firstName: Joi.string().trim().min(4).max(20).required().messages({
-    'string.min': 'First name must be at least 4 characters long',
+  firstName: Joi.string().trim().min(2).max(20).required().messages({
+    'string.min': 'First name must be at least 2 characters long',
     'string.max': 'First name must be at most 20 characters long',
     'string.empty': 'First name is a required field',
     'any.required': 'First name is a required field',
   }),
-  lastName: Joi.string().trim().max(20).required().messages({
-    'string.min': 'Last name must be at least 4 characters long',
+  lastName: Joi.string().trim().min(2).max(20).required().messages({
+    'string.min': 'Last name must be at least 2 characters long',
     'string.max': 'Last name must be at most 20 characters long',
     'string.empty': 'Last name is a required field',
     'any.required': 'Last name is a required field',
   }),
-  country: Joi.string().max(20).default(null).allow(null).messages({
+  country: Joi.string().max(50).default(null).allow(null).messages({
     'string.max': 'Country must be at most 20 characters long',
     'string.empty': 'Country is a required field',
     'any.required': 'Country is a required field',

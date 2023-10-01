@@ -62,7 +62,37 @@ const verify = async (code) => {
   return payload // Contiene azp, aud, at_hash, iat, exp y lo del anterior metodo
 }
 
-const generateBasicUser = (payload) => {
+const validateGoogleAuthCode = async (req, res, next) => {
+  try {
+    const code = req.body.code
+    if (!code)
+      return jsonResponse(false, res, 400, 'Authorization code is required')
+
+    req.body = await getUserFromGoogleCode(code) // Se pone en el body para checkEmailDuplicate
+
+    next()
+  } catch (error) {
+    // El codigo de autorización de google es de un solo uso, si se usa una segunda vez, se obtiene este error
+    return jsonResponse(
+      false,
+      res,
+      400,
+      'The Google authorization code is incorrect or has already been used.'
+    )
+  }
+}
+
+const generateBasicUser = (req, res, next) => {
+  const payload = req.body
+
+  if (payload.email_verified !== true)
+    return jsonResponse(
+      false,
+      res,
+      400,
+      'Please verify your email first with Google'
+    )
+
   // EL password tendra mas de 20 caracteres, pero no importa porque no se usa
   // en este caso el usuario se loguea con google, no con email y password
   const user = {
@@ -81,37 +111,9 @@ const generateBasicUser = (payload) => {
     online: false,
     lastLogin: null,
   }
-  return user
+
+  req.body = user
+  next()
 }
 
-const validateGoogleAuthCode = async (req, res, next) => {
-  try {
-    const code = req.body.code
-    if (!code)
-      return jsonResponse(false, res, 400, 'Authorization code is required')
-
-    const payload = await getUserFromGoogleCode(code)
-
-    if (payload.email_verified !== true)
-      return jsonResponse(
-        false,
-        res,
-        400,
-        'Please verify your email first with Google'
-      )
-
-    req.body = generateBasicUser(payload)
-
-    next()
-  } catch (error) {
-    // El codigo de autorización de google es de un solo uso, si se usa una segunda vez, se obtiene este error
-    return jsonResponse(
-      false,
-      res,
-      400,
-      'The Google authorization code is incorrect or has already been used.'
-    )
-  }
-}
-
-export { validateGoogleAuthCode }
+export { validateGoogleAuthCode, generateBasicUser }

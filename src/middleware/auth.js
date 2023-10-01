@@ -97,6 +97,7 @@ const verifiyPassword = (req, res, next) => {
 const generateToken = (req, res, next) => {
   try {
     const email = req.user ? req.user.email : req.body ? req.body.email : null
+    if (!email) return jsonResponse(false, res, 500, 'Email not found')
     req.token = jwt.sign({ email: email }, process.env.SECRET_KEY, {
       expiresIn: process.env.TOKEN_EXPIRES_IN,
     })

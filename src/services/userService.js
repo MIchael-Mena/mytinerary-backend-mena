@@ -17,11 +17,6 @@ const getUserResponse = (user) => {
 }
 
 const verifyUserIsActive = (id, user, idText = 'id') => {
-  // if (!user || !user.active) {
-  //   throw new NotFoundError(
-  //     `User with ${idText} '${id}' not found or inactive.`
-  //   )
-  // }
   if (!user) throw new NotFoundError(`User with ${idText} '${id}' not found.`)
 
   if (user && !user.active)

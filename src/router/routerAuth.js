@@ -16,7 +16,10 @@ import {
   checkEmailDuplicate,
   passportJwtAuthentication,
 } from '../middleware/auth.js'
-import { validateGoogleAuthCode } from '../middleware/authGoogle.js'
+import {
+  generateBasicUser,
+  validateGoogleAuthCode,
+} from '../middleware/authGoogle.js'
 
 const routerAuth = express.Router()
 
@@ -66,6 +69,7 @@ routerAuth.use('/user', [
       '/register-google',
       validateGoogleAuthCode,
       checkEmailDuplicate,
+      generateBasicUser,
       hashPassword,
       generateToken,
       register
@@ -76,7 +80,6 @@ routerAuth.use('/user', [
       '/login-google',
       validateGoogleAuthCode,
       checkUserExists,
-      verifiyPassword,
       generateToken,
       login
     ),

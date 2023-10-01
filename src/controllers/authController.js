@@ -14,7 +14,7 @@ const register = async (req, res, next) => {
       true,
       res,
       201,
-      'User registered successfully',
+      'User created successfully!',
       getUserResponse(user),
       req.token ?? null
     )
@@ -31,7 +31,7 @@ const login = async (req, res, next) => {
       true,
       res,
       200,
-      'User logged',
+      'User logged in successfully!',
       getUserResponse(req.user),
       req.token
     )
