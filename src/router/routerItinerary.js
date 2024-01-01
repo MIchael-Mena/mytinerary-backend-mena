@@ -10,7 +10,6 @@ import {
   userHasLikedItinerary,
 } from '../controllers/itineraryController.js'
 import { passportJwtAuthentication } from '../middleware/auth.js'
-import { use } from 'passport'
 
 const routerItinerary = express.Router()
 
