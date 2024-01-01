@@ -16,12 +16,14 @@ const getCitiesNotFoundMessage = (searchQuery) => {
     : 'Cities not found.'
 }
 
-// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar&popItineraries=true
+// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar&populate_itineraries=true
 const getCities = async (req, res, next) => {
   try {
     const sortOptions = getSortOptions(req.query)
     const { limit, page, queryToFind } = getQueryOptions(req.query)
-    const popItineraries = req.query['popItineraries'] === 'true'
+    const popItineraries =
+      req.query['populate_itineraries'] === 'true' &&
+      req.query['basic_info'] !== 'true'
 
     const { cities, totalPages, totalCitiesCount } =
       await getCitiesResultsService(
@@ -29,7 +31,8 @@ const getCities = async (req, res, next) => {
         sortOptions,
         page,
         limit,
-        popItineraries
+        popItineraries,
+        req.query['basic_info'] === 'true'
       )
 
     const hasCities = cities.length > 0

@@ -1,10 +1,13 @@
 import jsonResponse from '../utils/jsonResponse.js'
 import {
+  addLikeToItineraryService,
   createItinerariesService,
   deleteItineraryService,
   getItinerariesByCityIdService,
   getItineraryByIdService,
+  removeLikeFromItineraryService,
   updateItineraryService,
+  userHasLikedItineraryService,
 } from '../services/itineraryService.js'
 import { updateCityService } from '../services/cityService.js'
 
@@ -85,10 +88,57 @@ const updateItinerary = async (req, res, next) => {
   }
 }
 
+const addLikeToItinerary = async (req, res, next) => {
+  try {
+    const itineraryId = req.params.id
+
+    const userId = await addLikeToItineraryService(itineraryId, req.user.id)
+
+    jsonResponse(true, res, 200, 'Like added successfully.')
+  } catch (error) {
+    next(error)
+  }
+}
+
+const removeLikeFromItinerary = async (req, res, next) => {
+  try {
+    const itineraryId = req.params.id
+
+    await removeLikeFromItineraryService(itineraryId, req.user.id)
+
+    jsonResponse(true, res, 200, 'Like removed successfully.')
+  } catch (error) {
+    next(error)
+  }
+}
+
+const userHasLikedItinerary = async (req, res, next) => {
+  try {
+    const itineraryId = req.params.id
+
+    const { hasLiked } = await userHasLikedItineraryService(
+      itineraryId,
+      req.user.id
+    )
+
+    jsonResponse(
+      hasLiked,
+      res,
+      200,
+      hasLiked ? 'User has liked itinerary.' : 'User has not liked itinerary.'
+    )
+  } catch (error) {
+    next(error)
+  }
+}
+
 export {
   createItinerary,
   getItineraryById,
   deleteItinerary,
   updateItinerary,
   getItinerariesByCityId,
+  addLikeToItinerary,
+  removeLikeFromItinerary,
+  userHasLikedItinerary,
 }

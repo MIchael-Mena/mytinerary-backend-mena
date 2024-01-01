@@ -13,6 +13,7 @@ const ItinerarySchema = new Schema(
     user: {
       type: Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     likes: {
       type: Number,
@@ -35,6 +36,7 @@ const ItinerarySchema = new Schema(
   { timestamps: true }
 )
 
+// El tercer parametro indica el nombre de la coleccion en la base de datos
 const Itinerary = model('Itinerary', ItinerarySchema, 'itineraries')
 
 export default Itinerary

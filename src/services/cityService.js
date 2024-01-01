@@ -50,12 +50,20 @@ const populateItineraries = async (cities, hasPopItinerariesParam) => {
   await City.populate(cities, populateCity)
 }
 
+const getCitiesBasicInfo = (cities) => {
+  return cities.map((city) => {
+    const { _id, name, description, country, images } = city
+    return { _id, name, description, country, images }
+  })
+}
+
 const getCitiesResultsService = async (
   queryToFind,
   sortOptions,
   page,
   limit,
-  hasPopItinerariesParam
+  hasPopItinerariesParam,
+  hasBasicInfoParam
 ) => {
   const aggregationPipeline = buildAggregationPipeline(
     queryToFind,
@@ -64,11 +72,13 @@ const getCitiesResultsService = async (
     limit
   )
   const [aggregationResult] = await City.aggregate(aggregationPipeline)
-  const cities = aggregationResult.results
+  let cities = aggregationResult.results
   await populateItineraries(cities, hasPopItinerariesParam)
 
   const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
   const totalPages = Math.ceil(totalCitiesCount / limit)
+
+  if (hasBasicInfoParam) cities = getCitiesBasicInfo(cities)
 
   return { cities, totalPages, totalCitiesCount }
 }

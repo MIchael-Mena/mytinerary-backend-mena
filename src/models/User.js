@@ -14,7 +14,12 @@ const UserSchema = new Schema(
     profilePic: String,
     favouriteCities: [String],
     favouriteActivities: [String],
-    favouriteItineraries: [String],
+    favouriteItineraries: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Itinerary',
+      },
+    ],
     role: String,
     active: Boolean,
     online: Boolean,

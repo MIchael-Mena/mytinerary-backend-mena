@@ -117,7 +117,10 @@ const passportJwtAuthentication = passport.use(
     async (payload, done) => {
       try {
         const user = await getUserByEmailService(payload.email)
+
+        // Si el usuario no está online o no está activo, no se ejecuta el callback, y se devuelve un error 401
         if (!user.online || !user.active) return done(null, false)
+
         return done(null, user) // Con esto passport guarda el usuario en req.user
       } catch (error) {
         // return done(error instanceof NotFoundError ? null : error)

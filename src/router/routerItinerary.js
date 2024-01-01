@@ -5,8 +5,12 @@ import {
   deleteItinerary,
   updateItinerary,
   getItinerariesByCityId,
+  addLikeToItinerary,
+  removeLikeFromItinerary,
+  userHasLikedItinerary,
 } from '../controllers/itineraryController.js'
 import { passportJwtAuthentication } from '../middleware/auth.js'
+import { use } from 'passport'
 
 const routerItinerary = express.Router()
 
@@ -33,6 +37,23 @@ routerItinerary.use('/itinerary', [
       '/update/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
       updateItinerary
+    ),
+  express.Router().post(
+    '/like/:id', // Itinerary ID in params and user Id in req.user.id
+    passportJwtAuthentication.authenticate('jwt', { session: false }),
+    addLikeToItinerary
+  ),
+  express.Router().delete(
+    '/like/:id', // Itinerary ID in params and user Id in req.user.id
+    passportJwtAuthentication.authenticate('jwt', { session: false }),
+    removeLikeFromItinerary
+  ),
+  express
+    .Router()
+    .post(
+      '/check-user-like/:id',
+      passportJwtAuthentication.authenticate('jwt', { session: false }),
+      userHasLikedItinerary
     ),
 ])
 

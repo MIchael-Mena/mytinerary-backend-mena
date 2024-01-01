@@ -1,7 +1,5 @@
 const getActiveUsers = async (req, res, next) => {
   try {
-    // const users = await getActiveUsersService()
-    // jsonResponse(true, res, 200, 'Users retrieved successfully.', users)
   } catch (error) {
     next(error)
   }

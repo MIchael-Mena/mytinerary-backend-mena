@@ -83,6 +83,53 @@ const createItinerariesService = async (itinerariesData) => {
   return Promise.all(itineraries)
 }
 
+const addLikeToItineraryService = async (itineraryId, userId) => {
+  const itinerary = await getItineraryByIdService(itineraryId)
+
+  // verifico si el usuario ya tiene un like en este itinerario
+  const { user, hasLiked } = await userHasLikedItineraryService(
+    itineraryId,
+    userId
+  )
+  if (hasLiked) {
+    throw new Error('User already liked this itinerary.')
+  }
+
+  await user.updateOne({ $push: { favouriteItineraries: itineraryId } })
+
+  // Al hacer esto me ahorro tener que estar calculando el total de likes cuando se pida un itinerario
+  itinerary.likes++
+
+  await itinerary.save()
+}
+
+const removeLikeFromItineraryService = async (itineraryId, userId) => {
+  const itinerary = await getItineraryByIdService(itineraryId)
+
+  const { user, hasLiked } = await userHasLikedItineraryService(
+    itineraryId,
+    userId
+  )
+  if (!hasLiked) {
+    throw new Error('User has not liked this itinerary.')
+  }
+
+  await user.updateOne({ $pull: { favouriteItineraries: itineraryId } })
+
+  itinerary.likes--
+
+  await itinerary.save()
+}
+
+const userHasLikedItineraryService = async (itineraryId, userId) => {
+  const user = await getUserByIdService(userId)
+
+  return {
+    hasLiked: user.favouriteItineraries.includes(itineraryId),
+    user,
+  }
+}
+
 export {
   deleteItineraryService,
   updateItineraryService,
@@ -90,4 +137,7 @@ export {
   getItinerariesByCityIdService,
   createItineraryService,
   createItinerariesService,
+  addLikeToItineraryService,
+  removeLikeFromItineraryService,
+  userHasLikedItineraryService,
 }
