@@ -101,6 +101,7 @@ const addLikeToItineraryService = async (itineraryId, userId) => {
   itinerary.likes++
 
   await itinerary.save()
+  return { totalLikes: itinerary.likes, user }
 }
 
 const removeLikeFromItineraryService = async (itineraryId, userId) => {
@@ -119,6 +120,7 @@ const removeLikeFromItineraryService = async (itineraryId, userId) => {
   itinerary.likes--
 
   await itinerary.save()
+  return { totalLikes: itinerary.likes, user }
 }
 
 const userHasLikedItineraryService = async (itineraryId, userId) => {

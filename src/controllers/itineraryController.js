@@ -92,9 +92,12 @@ const addLikeToItinerary = async (req, res, next) => {
   try {
     const itineraryId = req.params.id
 
-    const userId = await addLikeToItineraryService(itineraryId, req.user.id)
+    const { totalLikes } = await addLikeToItineraryService(
+      itineraryId,
+      req.user.id
+    )
 
-    jsonResponse(true, res, 200, 'Like added successfully.')
+    jsonResponse(true, res, 200, 'Like added successfully.', { totalLikes })
   } catch (error) {
     next(error)
   }
@@ -104,9 +107,12 @@ const removeLikeFromItinerary = async (req, res, next) => {
   try {
     const itineraryId = req.params.id
 
-    await removeLikeFromItineraryService(itineraryId, req.user.id)
+    const { totalLikes } = await removeLikeFromItineraryService(
+      itineraryId,
+      req.user.id
+    )
 
-    jsonResponse(true, res, 200, 'Like removed successfully.')
+    jsonResponse(true, res, 200, 'Like removed successfully.', { totalLikes })
   } catch (error) {
     next(error)
   }
