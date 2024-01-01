@@ -1,0 +1,39 @@
+[{
+  "_id": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "email": "example@example.com",
+  "password": "$2b$10$A8r1y4ikgGI8MmaQ3w.cq.ucD9/A4xQOXqEcisS9tP3aTtrGRedQC",
+  "country": "United States",
+  "profilePic": "",
+  "favouriteCities": [
+    "New York",
+    "Los Angeles"
+  ],
+  "favouriteActivities": [
+    "Hiking",
+    "Cooking"
+  ],
+  "favouriteItineraries": [
+    "Beach Trip",
+    "City Exploration"
+  ],
+  "role": "admin",
+  "active": true,
+  "createdAt": {
+    "$date": "2023-08-28T14:55:37.106Z"
+  },
+  "updatedAt": {
+    "$date": "2023-12-31T18:29:15.995Z"
+  },
+  "__v": 0,
+  "birthDate": {
+    "$date": "1993-01-15T00:00:00.000Z"
+  },
+  "firstName": "John",
+  "lastName": "Doe",
+  "online": false,
+  "lastLogin": {
+    "$date": "2023-12-31T18:21:15.934Z"
+  }
+}]

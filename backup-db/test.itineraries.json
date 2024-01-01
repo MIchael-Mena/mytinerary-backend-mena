@@ -1,0 +1,168 @@
+[{
+  "_id": {
+    "$oid": "64f3fd613afba31567eef3b6"
+  },
+  "title": "Explore the Eiffel Tower",
+  "duration": 180,
+  "price": 3,
+  "_city": {
+    "$oid": "64dfccd9e8b26ed0cc6584e9"
+  },
+  "user": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "likes": 12,
+  "hashtags": [
+    "sightseeing",
+    "adventure"
+  ],
+  "activities": [],
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-09-03T03:28:33.366Z"
+  },
+  "updatedAt": {
+    "$date": "2023-09-03T03:28:33.366Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64f3fd613afba31567eef3bd"
+  },
+  "title": "Louvre Museum Tour",
+  "duration": 240,
+  "price": 4,
+  "_city": {
+    "$oid": "64dfccd9e8b26ed0cc6584e9"
+  },
+  "user": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "likes": 25,
+  "hashtags": [
+    "art",
+    "culture"
+  ],
+  "activities": [],
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-09-03T03:28:33.387Z"
+  },
+  "updatedAt": {
+    "$date": "2023-09-03T03:28:33.387Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64f3fd613afba31567eef3c4"
+  },
+  "title": "Visit Tokyo Skytree",
+  "duration": 120,
+  "price": 2,
+  "_city": {
+    "$oid": "64dfccd9e8b26ed0cc6584ea"
+  },
+  "user": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "likes": 8,
+  "hashtags": [
+    "sightseeing",
+    "skyscraper"
+  ],
+  "activities": [],
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-09-03T03:28:33.398Z"
+  },
+  "updatedAt": {
+    "$date": "2023-09-03T03:28:33.398Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64f3fd613afba31567eef3cb"
+  },
+  "title": "Explore Tsukiji Fish Market",
+  "duration": 150,
+  "price": 3,
+  "_city": {
+    "$oid": "64dfccd9e8b26ed0cc6584ea"
+  },
+  "user": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "likes": 10,
+  "hashtags": [
+    "food",
+    "market"
+  ],
+  "activities": [],
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-09-03T03:28:33.409Z"
+  },
+  "updatedAt": {
+    "$date": "2023-09-03T03:28:33.409Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64f3fd613afba31567eef3d2"
+  },
+  "title": "Colosseum Guided Tour",
+  "duration": 240,
+  "price": 4,
+  "_city": {
+    "$oid": "64e3c709738a7c13f2d8e961"
+  },
+  "user": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "likes": 18,
+  "hashtags": [
+    "history",
+    "ancient"
+  ],
+  "activities": [],
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-09-03T03:28:33.422Z"
+  },
+  "updatedAt": {
+    "$date": "2023-09-03T03:28:33.422Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64f3fd613afba31567eef3d9"
+  },
+  "title": "Vatican City Exploration",
+  "duration": 180,
+  "price": 3,
+  "_city": {
+    "$oid": "64e3c709738a7c13f2d8e961"
+  },
+  "user": {
+    "$oid": "64ecb56946c247d7a33f390f"
+  },
+  "likes": 15,
+  "hashtags": [
+    "art",
+    "religion"
+  ],
+  "activities": [],
+  "comments": [],
+  "createdAt": {
+    "$date": "2023-09-03T03:28:33.433Z"
+  },
+  "updatedAt": {
+    "$date": "2023-09-03T03:28:33.433Z"
+  },
+  "__v": 0
+}]
