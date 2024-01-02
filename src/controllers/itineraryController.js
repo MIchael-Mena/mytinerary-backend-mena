@@ -97,7 +97,10 @@ const addLikeToItinerary = async (req, res, next) => {
       req.user.id
     )
 
-    jsonResponse(true, res, 200, 'Like added successfully.', { totalLikes })
+    jsonResponse(true, res, 200, 'Like added successfully.', {
+      totalLikes,
+      itineraryId,
+    })
   } catch (error) {
     next(error)
   }
@@ -112,7 +115,10 @@ const removeLikeFromItinerary = async (req, res, next) => {
       req.user.id
     )
 
-    jsonResponse(true, res, 200, 'Like removed successfully.', { totalLikes })
+    jsonResponse(true, res, 200, 'Like removed successfully.', {
+      totalLikes,
+      itineraryId,
+    })
   } catch (error) {
     next(error)
   }

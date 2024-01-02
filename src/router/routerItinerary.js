@@ -43,7 +43,7 @@ routerItinerary.use('/itinerary', [
     addLikeToItinerary
   ),
   express.Router().delete(
-    '/like/:id', // Itinerary ID in params and user Id in req.user.id
+    '/dislike/:id', // Itinerary ID in params and user Id in req.user.id
     passportJwtAuthentication.authenticate('jwt', { session: false }),
     removeLikeFromItinerary
   ),
