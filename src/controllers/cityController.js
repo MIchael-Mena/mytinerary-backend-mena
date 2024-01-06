@@ -15,7 +15,7 @@ const getCitiesNotFoundMessage = (searchQuery) => {
     : 'Cities not found.'
 }
 
-// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar&populate_itineraries=true
+// Ejemplo del endpoint: /city?sort=rating&order=desc&limit=5&page=2&search=bar&populate_itineraries=true&basic_info=true
 const getCities = async (req, res, next) => {
   try {
     const sortOptions = getSortOptions(req.query)
@@ -66,7 +66,11 @@ const createCity = async (req, res, next) => {
 
 const getCityById = async (req, res, next) => {
   try {
-    const cityFound = await getCityByIdService(req.params.id)
+    const { populate_itineraries } = req.query
+    const cityFound = await getCityByIdService(
+      req.params.id,
+      populate_itineraries === 'true'
+    )
 
     jsonResponse(true, res, 200, 'City retrieved successfully.', cityFound)
   } catch (error) {

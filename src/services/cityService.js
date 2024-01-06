@@ -21,7 +21,7 @@ const getPagination = (query) => {
 }
 
 const getSortOptions = (query) => {
-  const sortField = query.sort || 'updatedAt'
+  const sortField = query.sort || 'updatedAt' // Si no se especifica el campo por el que se quiere ordenar, se ordena por fecha de actualización
   const sortOrder = query.order === 'desc' ? -1 : 1
   return { [sortField]: sortOrder }
 }
@@ -40,7 +40,7 @@ const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
     { $sort: sortOptions },
     {
       $facet: {
-        results: [{ $skip: (page - 1) * limit }, { $limit: limit }],
+        results: [{ $skip: (page - 1) * limit }, { $limit: limit }], // Se usa para paginar
         totalCount: [{ $count: 'count' }],
       },
     },
@@ -48,8 +48,10 @@ const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
 }
 
 const populateItineraries = async (cities, mustBePopulated) => {
+  console.log('populateItineraries', mustBePopulated)
   if (!mustBePopulated) return Promise.resolve()
   await City.populate(cities, populateCity)
+  console.log('populateItineraries')
 }
 
 const getCitiesBasicInfo = (cities) => {
@@ -137,7 +139,7 @@ const updateCityService = async (cityId, cityData) => {
 
 const getCityByIdService = async (cityId, shouldBePopulated = false) => {
   validateId(cityId, 'City')
-  // const city = await City.findById(cityId).populate(populateCity)
+
   const city = await City.findById(cityId)
   verifyCityExists(city, cityId)
 
