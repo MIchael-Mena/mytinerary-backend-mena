@@ -15,7 +15,7 @@ const populateCity = {
 
 const getPagination = (query) => {
   const defaultPagination = { limit: 9, page: 1 }
-  const limit = query.limit ? parseInt(query.limit) : defaultPagination.limitF
+  const limit = query.limit ? parseInt(query.limit) : defaultPagination.limit
   const page = query.page ? parseInt(query.page) : defaultPagination.page
   return { limit, page }
 }
@@ -40,7 +40,7 @@ const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
     { $sort: sortOptions },
     {
       $facet: {
-        results: [{ $skip: (page - 1) * limit }, { $limit: limit }], // Se usa para paginar
+        results: [{ $skip: (page - 1) * limit }, { $limit: limit }], // Paginación
         totalCount: [{ $count: 'count' }],
       },
     },
