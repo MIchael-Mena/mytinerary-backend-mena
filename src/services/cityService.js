@@ -48,10 +48,8 @@ const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
 }
 
 const populateItineraries = async (cities, mustBePopulated) => {
-  console.log('populateItineraries', mustBePopulated)
   if (!mustBePopulated) return Promise.resolve()
   await City.populate(cities, populateCity)
-  console.log('populateItineraries')
 }
 
 const getCitiesBasicInfo = (cities) => {
