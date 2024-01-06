@@ -17,7 +17,7 @@ const CitySchema = new Schema(
     timezone: { type: String, required: true, maxlength: 100 },
     itineraries: {
       type: [{ type: Types.ObjectId, ref: 'Itinerary' }],
-      default: [],
+      default: [], // En este caso no es necesario, pero lo pongo para que se vea que se puede hacer
     },
   },
   { timestamps: true }

@@ -12,12 +12,18 @@ const UserSchema = new Schema(
     country: String,
     birthDate: Date,
     profilePic: String,
-    favouriteCities: [String],
+    favouriteCities: [String], // En un futuro podria ser un array de objetos con el id de de la ciudad
     favouriteActivities: [String],
     favouriteItineraries: [
       {
         type: Schema.Types.ObjectId,
         ref: 'Itinerary',
+      },
+    ],
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
       },
     ],
     role: String,

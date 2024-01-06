@@ -4,7 +4,6 @@ import {
   getCities,
   createCity,
   deleteCity,
-  deleteItineraries,
   updateCity,
 } from '../controllers/cityController.js'
 import validateQueryParams from '../middleware/city/validateQueryParams.js'
@@ -37,13 +36,6 @@ routerCity.use('/city', [
       '/delete/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
       deleteCity
-    ),
-  express
-    .Router()
-    .delete(
-      '/delete-itineraries/:cityId',
-      passportJwtAuthentication.authenticate('jwt', { session: false }),
-      deleteItineraries
     ),
 ])
 

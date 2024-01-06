@@ -1,11 +1,13 @@
 import City from '../models/City.js'
-import Itinerary from '../models/Itinerary.js'
 import { NotFoundError } from '../exceptions/NotFoundError.js'
 import { validateId } from './util.js'
+import { deleteItinerariesByCityIdService } from './itineraryService.js'
+import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
 
 const populateCity = {
-  path: 'itineraries',
+  path: 'itineraries', // Indico que quiero popular la propiedad 'itineraries' del modelo City
   populate: {
+    // Indico que quiero popular la propiedad 'user' del modelo Itinerary
     path: 'user',
     select: 'firstName lastName profilePic',
   },
@@ -13,7 +15,7 @@ const populateCity = {
 
 const getPagination = (query) => {
   const defaultPagination = { limit: 9, page: 1 }
-  const limit = query.limit ? parseInt(query.limit) : defaultPagination.limit
+  const limit = query.limit ? parseInt(query.limit) : defaultPagination.limitF
   const page = query.page ? parseInt(query.page) : defaultPagination.page
   return { limit, page }
 }
@@ -45,8 +47,8 @@ const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
   ]
 }
 
-const populateItineraries = async (cities, hasPopItinerariesParam) => {
-  if (!hasPopItinerariesParam) return Promise.resolve()
+const populateItineraries = async (cities, mustBePopulated) => {
+  if (!mustBePopulated) return Promise.resolve()
   await City.populate(cities, populateCity)
 }
 
@@ -62,7 +64,7 @@ const getCitiesResultsService = async (
   sortOptions,
   page,
   limit,
-  hasPopItinerariesParam,
+  hasPopulateParam,
   hasBasicInfoParam
 ) => {
   const aggregationPipeline = buildAggregationPipeline(
@@ -73,7 +75,7 @@ const getCitiesResultsService = async (
   )
   const [aggregationResult] = await City.aggregate(aggregationPipeline)
   let cities = aggregationResult.results
-  await populateItineraries(cities, hasPopItinerariesParam)
+  await populateItineraries(cities, hasPopulateParam)
 
   const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
   const totalPages = Math.ceil(totalCitiesCount / limit)
@@ -92,34 +94,18 @@ const getTotalCitiesCountService = async (query) => {
   return totalCitiesCount
 }
 
-const deleteItinerariesService = async (cityId) => {
-  validateId(cityId, 'City')
-  const city = await City.findById(cityId)
-  verifyCityExists(city, cityId)
-
-  const { itineraries } = city
-
-  if (itineraries.length === 0)
-    throw new NotFoundError('There are no itineraries to delete for this city.')
-
-  await Itinerary.deleteMany({ _id: { $in: itineraries } })
-
-  return city
-}
-
 const deleteCityService = async (cityId) => {
   validateId(cityId, 'City')
   const city = await City.findByIdAndDelete(cityId)
-  verifyCityExists(city, cityId)
+  verifyCityExists(city, cityId) // Verifico que se haya encontrado la ciudad y por lo tanto eliminado
 
-  // await city.deleteOne()
-
-  await Itinerary.deleteMany({ _city: city._id })
+  await deleteItinerariesByCityIdService(cityId)
 
   return city
 }
 
 const updateCityService = async (cityId, cityData) => {
+  // TODO: No se puede actualizar los itinerarios de una ciudad
   validateId(cityId, 'City')
 
   const cityToUpdate = await City.findByIdAndUpdate(cityId, cityData, {
@@ -149,7 +135,7 @@ const updateCityService = async (cityId, cityData) => {
   return cityToUpdate
 }
 
-const getCityByIdService = async (cityId, shouldBePopulated = true) => {
+const getCityByIdService = async (cityId, shouldBePopulated = false) => {
   validateId(cityId, 'City')
   // const city = await City.findById(cityId).populate(populateCity)
   const city = await City.findById(cityId)
@@ -161,6 +147,16 @@ const getCityByIdService = async (cityId, shouldBePopulated = true) => {
 }
 
 const createCityService = async (cityData) => {
+  const hasItineraries = Array.isArray(cityData)
+    ? cityData.some((city) => city.itineraries.length > 0)
+    : cityData.itineraries.length > 0
+
+  if (hasItineraries)
+    throw new InvalidFieldError(
+      'Itineraries cannot be created with the city, use the itinerary endpoint.',
+      409
+    )
+
   const cities = await City.insertMany(cityData)
   return cities
 }
@@ -170,7 +166,6 @@ const verifyCityExists = (city, cityID) => {
 }
 
 export {
-  deleteItinerariesService,
   deleteCityService,
   updateCityService,
   getCityByIdService,

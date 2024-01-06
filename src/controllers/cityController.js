@@ -1,7 +1,6 @@
 import jsonResponse from '../utils/jsonResponse.js'
 import {
   deleteCityService,
-  deleteItinerariesService,
   getCityByIdService,
   updateCityService,
   getCitiesResultsService,
@@ -96,26 +95,4 @@ const deleteCity = async (req, res, next) => {
   }
 }
 
-const deleteItineraries = async (req, res, next) => {
-  try {
-    const { cityId } = req.params
-    const city = await deleteItinerariesService(cityId)
-
-    city.itineraries = [] // Vaciamos el array de itinerarios, porque me devuelve los itinerarios que se han borrado
-
-    await city.save()
-
-    jsonResponse(true, res, 200, 'Itineraries deleted successfully.')
-  } catch (error) {
-    next(error)
-  }
-}
-
-export {
-  getCities as getCities,
-  createCity as createCity,
-  getCityById,
-  updateCity,
-  deleteCity,
-  deleteItineraries,
-}
+export { getCities, createCity, getCityById, updateCity, deleteCity }

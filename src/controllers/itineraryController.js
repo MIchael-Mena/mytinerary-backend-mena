@@ -2,6 +2,7 @@ import jsonResponse from '../utils/jsonResponse.js'
 import {
   addLikeToItineraryService,
   createItinerariesService,
+  deleteItinerariesByCityIdService,
   deleteItineraryService,
   getItinerariesByCityIdService,
   getItineraryByIdService,
@@ -12,17 +13,19 @@ import {
 import { updateCityService } from '../services/cityService.js'
 
 // Puede resivir una lista de itinerarios o un solo itinerario
-const createItinerary = async (req, res, next) => {
+const createItineraries = async (req, res, next) => {
   try {
-    const itinerariesData = Array.isArray(req.body) ? req.body : [req.body]
-
+    const isArrayOfItineraries = Array.isArray(req.body)
+    const itinerariesData = isArrayOfItineraries ? req.body : [req.body]
     const itineraries = await createItinerariesService(itinerariesData)
 
     jsonResponse(
       true,
       res,
       201,
-      'Itineraries created successfully.',
+      isArrayOfItineraries
+        ? 'Itineraries created successfully.'
+        : 'Itinerary created successfully.',
       itineraries
     )
   } catch (error) {
@@ -32,15 +35,7 @@ const createItinerary = async (req, res, next) => {
 
 const getItinerariesByCityId = async (req, res, next) => {
   try {
-    const itineraries = await getItinerariesByCityIdService(req.params.id)
-
-    if (itineraries.length === 0)
-      return jsonResponse(
-        false,
-        res,
-        404,
-        'There are no itineraries for this city.'
-      )
+    const itineraries = await getItinerariesByCityIdService(req.params.cityId)
 
     jsonResponse(
       true,
@@ -144,10 +139,21 @@ const userHasLikedItinerary = async (req, res, next) => {
   }
 }
 
+const deleteItinerariesByCityId = async (req, res, next) => {
+  try {
+    const { cityId } = req.params
+    const city = await deleteItinerariesByCityIdService(cityId)
+    jsonResponse(true, res, 200, 'Itineraries deleted successfully.')
+  } catch (error) {
+    next(error)
+  }
+}
+
 export {
-  createItinerary,
+  createItineraries,
   getItineraryById,
   deleteItinerary,
+  deleteItinerariesByCityId,
   updateItinerary,
   getItinerariesByCityId,
   addLikeToItinerary,

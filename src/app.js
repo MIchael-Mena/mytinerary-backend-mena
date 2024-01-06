@@ -11,13 +11,21 @@ import routerCity from './router/routerCity.js'
 import routerItinerary from './router/routerItinerary.js'
 import cors from 'cors'
 import routerAuth from './router/routerAuth.js'
+import routerActivity from './router/routerActivity.js'
+import routerComment from './router/routerComment.js'
 
 const app = express()
 
 app.use(cors())
 app.use(express.json()) // para que express entienda el formato json
 
-app.use('/api', [routerCity, routerItinerary, routerAuth])
+app.use('/api', [
+  routerCity,
+  routerItinerary,
+  routerAuth,
+  routerActivity,
+  routerComment,
+])
 
 app.use(errorHandler)
 app.use(notFoundHandler)

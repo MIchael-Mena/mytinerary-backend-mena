@@ -17,6 +17,7 @@ const getUserResponse = (user) => {
 }
 
 const verifyUserIsActive = (id, user, idText = 'id') => {
+  // TODO: Revisar si esta bien devolver un error 404 cuando el usuario no esta activo
   if (!user) throw new NotFoundError(`User with ${idText} '${id}' not found.`)
 
   if (user && !user.active)

@@ -3,7 +3,16 @@ import { Schema, model, Types } from 'mongoose'
 const ItinerarySchema = new Schema(
   {
     title: { type: String, required: true, maxlength: 100 },
-    duration: { type: Number, required: true, min: 0 }, // in minutes
+    duration: {
+      type: Number,
+      default: 0,
+      /*       validate: {
+        // No lo uso ya que se ejecuta tanto con el metodo create como en save y no quiero que se ejecute en save
+        validator: (value) => value === 0,
+        message:
+          'Initial duration must be 0. It will be updated when activities are added.',
+      }, */
+    }, // in minutes
     price: { type: Number, required: true, min: 1, max: 5 }, // 1 = low, 5 = high
     _city: {
       type: Types.ObjectId,

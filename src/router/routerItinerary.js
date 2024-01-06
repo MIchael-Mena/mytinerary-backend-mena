@@ -1,13 +1,14 @@
 import express from 'express'
 import {
   getItineraryById,
-  createItinerary,
+  createItineraries,
   deleteItinerary,
   updateItinerary,
   getItinerariesByCityId,
   addLikeToItinerary,
   removeLikeFromItinerary,
   userHasLikedItinerary,
+  deleteItinerariesByCityId,
 } from '../controllers/itineraryController.js'
 import { passportJwtAuthentication } from '../middleware/auth.js'
 
@@ -15,13 +16,13 @@ const routerItinerary = express.Router()
 
 routerItinerary.use('/itinerary', [
   express.Router().get('/:id', getItineraryById),
-  express.Router().get('/:cityId', getItinerariesByCityId),
+  express.Router().get('/for-city/:cityId', getItinerariesByCityId),
   express
     .Router()
     .post(
       '/create',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
-      createItinerary
+      createItineraries
     ),
   express
     .Router()
@@ -29,6 +30,13 @@ routerItinerary.use('/itinerary', [
       '/delete/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
       deleteItinerary
+    ),
+  express
+    .Router()
+    .delete(
+      '/delete-for-city/:cityId',
+      passportJwtAuthentication.authenticate('jwt', { session: false }),
+      deleteItinerariesByCityId
     ),
   express
     .Router()
