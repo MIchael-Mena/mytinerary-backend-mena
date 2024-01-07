@@ -2,7 +2,7 @@ import { Types, Schema, model } from 'mongoose'
 
 const ActivitySchema = new Schema(
   {
-    name: { type: String, required: true, maxlength: 100 },
+    title: { type: String, required: true, maxlength: 100 },
     duration: { type: Number, required: true, min: 0 }, // in minutes
     description: { type: String, required: true, maxlength: 1000 },
     _itinerary: {
