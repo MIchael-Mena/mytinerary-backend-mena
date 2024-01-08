@@ -5,6 +5,7 @@ import User from '../models/User.js'
 import { getItineraryByIdService } from './itineraryService.js'
 import { getUserByIdService } from './userService.js'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
+import { validateId } from './util.js'
 
 const modifyCommentOnModel = async (
   commentId,
@@ -120,6 +121,7 @@ const getCommentByIdService = async (commentId) => {
 }
 
 const getCommentByItineraryIdService = async (itineraryId) => {
+  validateId(itineraryId, 'Itinerary')
   const comments = await Comment.find({ _reference: itineraryId })
     .populate({
       path: '_user',
