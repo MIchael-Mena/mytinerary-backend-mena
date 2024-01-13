@@ -4,12 +4,15 @@ import User from '../models/User.js'
 
 const getUserResponse = (user) => {
   return {
-    id: user._id,
+    _id: user._id,
     // lastLogin: user.lastLogin,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    country: user.country,
+    birthDate: user.birthDate,
     profilePic: user.profilePic,
+    comments: user.comments,
     favouriteCities: user.favouriteCities,
     favouriteActivities: user.favouriteActivities,
     favouriteItineraries: user.favouriteItineraries,
@@ -55,7 +58,7 @@ const updateLoginStatusService = async (email, loginState) => {
 const createUserService = async (payload) => {
   const user = new User(payload)
   await user.save()
-  return getUserResponse(user)
+  return user
 }
 
 const deleteAccountService = async (id) => {

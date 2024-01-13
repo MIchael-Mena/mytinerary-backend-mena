@@ -6,6 +6,7 @@ import { getItineraryByIdService } from './itineraryService.js'
 import { getUserByIdService } from './userService.js'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
 import { validateId } from './util.js'
+import { get } from 'mongoose'
 
 const modifyCommentOnModel = async (
   commentId,
@@ -75,8 +76,15 @@ const createCommentService = async (commentData) => {
   return newComment
 }
 
+const verifyCommentExists = (commentId, comment) => {
+  if (!comment)
+    throw new NotFoundError(`Comment with id ${commentId} not found.`)
+}
+
 const deleteCommentService = async (commentId) => {
   const comment = await Comment.findByIdAndDelete(commentId)
+
+  verifyCommentExists(commentId, comment)
 
   await deleteCommentOnModel(commentId, comment.onModel, comment._reference)
 
@@ -110,12 +118,21 @@ const updateCommentService = async (commentId, commentData) => {
 }
 
 const getCommentByIdService = async (commentId) => {
+  // Con esta opcion si el id no existe o existe pero no tiene comentarios se lanzara un error
   const comment = await Comment.findById(commentId)
     .orFail(new NotFoundError(`Comment with id ${commentId} not found.`))
     .populate({
       path: '_user',
       select: 'firstName lastName profilePic',
     })
+
+  // Con esta opcion si el id no existe se lanzara un error y si existe pero no tiene comentarios se devolvera un array vacio
+  /*   validateId(commentId, 'Comment')
+  const comment = await Comment.findById(commentId).populate({
+    path: '_user',
+    select: 'firstName lastName profilePic',
+  })
+  verifyCommentExists(commentId, comment) */
 
   return comment
 }
@@ -132,6 +149,13 @@ const getCommentByItineraryIdService = async (itineraryId) => {
         `Comments for itinerary with id ${itineraryId} not found.`
       )
     )
+
+  /*   await getItineraryByIdService(itineraryId)
+  const comments = await Comment.find({ _reference: itineraryId }).populate({
+    path: '_user',
+    select: 'firstName lastName profilePic',
+  })
+  verifyCommentExists(itineraryId, comments) */
 
   return comments
 }

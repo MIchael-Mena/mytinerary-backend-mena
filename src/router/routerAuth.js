@@ -24,15 +24,14 @@ import {
 const routerAuth = express.Router()
 
 routerAuth.use('/user', [
-  express
-    .Router()
-    .post(
-      '/register',
-      validateUserDataRegister,
-      checkEmailDuplicate,
-      hashPassword,
-      register
-    ),
+  express.Router().post(
+    '/register',
+    validateUserDataRegister,
+    checkEmailDuplicate,
+    hashPassword,
+    generateToken, // Lo ideal seria validar el email antes de generar el token en el registro
+    register
+  ),
   express
     .Router()
     .post(
