@@ -59,14 +59,19 @@ const verifyUserHasNotCommentedInModel = async (user, model, modelType) => {
 }
 
 const createCommentService = async (commentData) => {
-  // TODO: un usuario no puedo comentar mas de una vez en un mismo modelo (itinerario, etc)
   const user = await getUserByIdService(commentData._user)
 
   const model = await getModelById(commentData.onModel, commentData._reference)
 
-  await verifyUserHasNotCommentedInModel(user, model, commentData.onModel)
+  // un usuario no puedo comentar mas de una vez en un mismo modelo (itinerario, etc)
+  // await verifyUserHasNotCommentedInModel(user, model, commentData.onModel)
 
-  const newComment = await Comment.create(commentData)
+  const newComment = await (
+    await Comment.create(commentData)
+  ).populate({
+    path: '_user',
+    select: 'firstName lastName profilePic',
+  })
 
   // model.id es la version string del id y model._id es la version ObjectId
   await updateCommentOnModel(newComment.id, commentData.onModel, model.id)
@@ -112,33 +117,37 @@ const updateCommentService = async (commentId, commentData) => {
   const comment = { text: commentData.text } // Solo se puede modificar el texto del comentario
   const commentUpdated = await Comment.findByIdAndUpdate(commentId, comment, {
     new: true, // devuelve el documento actualizado
-  }).orFail(new NotFoundError(`Comment with id ${commentId} not found.`))
+  })
+    .populate({
+      path: '_user',
+      select: 'firstName lastName profilePic',
+    })
+    .orFail(new NotFoundError(`Comment with id ${commentId} not found.`))
 
   return commentUpdated
 }
 
 const getCommentByIdService = async (commentId) => {
-  // Con esta opcion si el id no existe o existe pero no tiene comentarios se lanzara un error
-  const comment = await Comment.findById(commentId)
+  /*   const comment = await Comment.findById(commentId)
     .orFail(new NotFoundError(`Comment with id ${commentId} not found.`))
     .populate({
       path: '_user',
       select: 'firstName lastName profilePic',
-    })
+    }) */
 
-  // Con esta opcion si el id no existe se lanzara un error y si existe pero no tiene comentarios se devolvera un array vacio
-  /*   validateId(commentId, 'Comment')
+  validateId(commentId, 'Comment')
   const comment = await Comment.findById(commentId).populate({
     path: '_user',
     select: 'firstName lastName profilePic',
   })
-  verifyCommentExists(commentId, comment) */
+  verifyCommentExists(commentId, comment)
 
   return comment
 }
 
 const getCommentByItineraryIdService = async (itineraryId) => {
-  validateId(itineraryId, 'Itinerary')
+  // Con esta opcion si el id no existe o existe pero no tiene comentarios se lanzara un error 404
+  /*   validateId(itineraryId, 'Itinerary')
   const comments = await Comment.find({ _reference: itineraryId })
     .populate({
       path: '_user',
@@ -148,14 +157,14 @@ const getCommentByItineraryIdService = async (itineraryId) => {
       new NotFoundError(
         `Comments for itinerary with id ${itineraryId} not found.`
       )
-    )
+    ) */
 
-  /*   await getItineraryByIdService(itineraryId)
+  // Con esta opcion si el id no existe se lanzara un error y si existe pero no tiene comentarios se devolvera un array vacio
+  await getItineraryByIdService(itineraryId)
   const comments = await Comment.find({ _reference: itineraryId }).populate({
     path: '_user',
     select: 'firstName lastName profilePic',
   })
-  verifyCommentExists(itineraryId, comments) */
 
   return comments
 }
