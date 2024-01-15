@@ -6,7 +6,6 @@ import { getItineraryByIdService } from './itineraryService.js'
 import { getUserByIdService } from './userService.js'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
 import { validateId } from './util.js'
-import { get } from 'mongoose'
 
 const modifyCommentOnModel = async (
   commentId,
