@@ -113,6 +113,8 @@ const deleteCommentsByItineraryIdService = async (itineraryId) => {
 }
 
 const updateCommentService = async (commentId, commentData) => {
+  if (commentData.text === '')
+    throw new InvalidFieldError('Comment text cannot be empty.')
   const comment = { text: commentData.text } // Solo se puede modificar el texto del comentario
   const commentUpdated = await Comment.findByIdAndUpdate(commentId, comment, {
     new: true, // devuelve el documento actualizado
