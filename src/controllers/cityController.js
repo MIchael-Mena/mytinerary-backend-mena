@@ -24,7 +24,7 @@ const getCities = async (req, res, next) => {
       req.query['populate_itineraries'] === 'true' &&
       req.query['basic_info'] !== 'true'
 
-    const { cities, totalPages, totalCitiesCount } =
+    const { cities, totalPages, foundCitiesCount } =
       await getCitiesResultsService(
         queryToFind,
         sortOptions,
@@ -45,7 +45,7 @@ const getCities = async (req, res, next) => {
         : 'Cities retrieved successfully.',
       {
         totalPages,
-        totalCitiesCount,
+        foundCitiesCount,
         cities,
       }
     )

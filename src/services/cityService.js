@@ -77,21 +77,21 @@ const getCitiesResultsService = async (
   let cities = aggregationResult.results
   await populateItineraries(cities, hasPopulateParam)
 
-  const totalCitiesCount = aggregationResult.totalCount[0]?.count || 0
-  const totalPages = Math.ceil(totalCitiesCount / limit)
+  const foundCitiesCount = aggregationResult.totalCount[0]?.count || 0
+  const totalPages = Math.ceil(foundCitiesCount / limit)
 
   if (hasBasicInfoParam) cities = getCitiesBasicInfo(cities)
 
-  return { cities, totalPages, totalCitiesCount }
+  return { cities, totalPages, foundCitiesCount }
 }
 
-const getTotalCitiesCountService = async (query) => {
+const getFoundCitiesCountService = async (query) => {
   const countResult = await City.aggregate([
     { $match: query },
     { $count: 'count' },
   ])
-  const totalCitiesCount = countResult[0]?.count || 0
-  return totalCitiesCount
+  const foundCitiesCount = countResult[0]?.count || 0
+  return foundCitiesCount
 }
 
 const deleteCityService = async (cityId) => {
@@ -170,7 +170,7 @@ export {
   updateCityService,
   getCityByIdService,
   getCitiesResultsService,
-  getTotalCitiesCountService,
+  getFoundCitiesCountService,
   getQueryOptions,
   getSortOptions,
   createCityService,

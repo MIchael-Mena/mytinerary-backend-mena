@@ -2,7 +2,15 @@ import jsonResponse from '../../utils/jsonResponse.js'
 
 const validateQueryParams = (req, res, next) => {
   const validSortOptions = ['asc', 'desc']
-  const validSortFields = ['name', 'country', 'population', 'area', 'rating']
+  const validSortFields = [
+    'name',
+    'country',
+    'population',
+    'area',
+    'rating',
+    'createdAt',
+    'updatedAt',
+  ]
   const errors = []
 
   if (req.query.order && !validSortOptions.includes(req.query.order)) {
