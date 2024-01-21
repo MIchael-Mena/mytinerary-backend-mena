@@ -204,6 +204,7 @@ const getCommentByItineraryIdService = async (
   )
 
   let aggregationResult
+  // try catch usado para poder detectar errores en el pipeline de agregacion durante el desarrollo
   try {
     ;[aggregationResult] = await Comment.aggregate(aggregationPipeline)
   } catch (error) {
@@ -215,7 +216,7 @@ const getCommentByItineraryIdService = async (
 
   const commentsTotalCount = results.length > 0 ? totalCount[0].count : 0
 
-  const totalPages = Math.ceil(commentsTotalCount / limit)
+  const totalPages = limit > 0 ? Math.ceil(commentsTotalCount / limit) : 1
 
   return { comments: results, totalPages, totalCount: commentsTotalCount }
 }

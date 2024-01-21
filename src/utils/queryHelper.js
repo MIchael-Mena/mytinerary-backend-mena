@@ -1,5 +1,5 @@
 const getPagination = (query) => {
-  const defaultPagination = { limit: 9, page: 1 }
+  const defaultPagination = { limit: -1, page: 1 } // -1 significa que no hay límite
   const limit = query.limit ? parseInt(query.limit) : defaultPagination.limit
   const page = query.page ? parseInt(query.page) : defaultPagination.page
   return { limit, page }
@@ -48,12 +48,20 @@ const buildAggregationPipeline = (
 
   pipeline.push({
     $facet: {
-      results: [{ $skip: (page - 1) * limit }, { $limit: limit }], // Paginación
+      results: [
+        { $skip: (page - 1) * limit },
+        { $limit: buildLimitStage(limit) },
+      ], // Paginación
       totalCount: [{ $count: 'count' }],
     },
   })
 
   return pipeline
+}
+
+// En caso de que sea -1, se quita el límite con un número muy grande
+const buildLimitStage = (limit) => {
+  return limit > 0 ? limit : Number.MAX_SAFE_INTEGER
 }
 
 export {

@@ -79,7 +79,7 @@ const getCitiesResultsService = async (
   await populateItineraries(cities, hasPopulateParam)
 
   const totalCount = aggregationResult.totalCount[0]?.count || 0
-  const totalPages = Math.ceil(totalCount / limit)
+  const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 1
 
   if (hasBasicInfoParam) cities = getCitiesBasicInfo(cities)
 
