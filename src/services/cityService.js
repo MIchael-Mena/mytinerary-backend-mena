@@ -3,6 +3,7 @@ import { NotFoundError } from '../exceptions/NotFoundError.js'
 import { validateId } from './util.js'
 import { deleteItinerariesByCityIdService } from './itineraryService.js'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
+import { buildAggregationPipeline } from '../utils/queryHelper.js'
 
 const populateCity = {
   path: 'itineraries', // Indico que quiero popular la propiedad 'itineraries' del modelo City
@@ -13,7 +14,7 @@ const populateCity = {
   },
 }
 
-const getPagination = (query) => {
+/* const getPagination = (query) => {
   const defaultPagination = { limit: 9, page: 1 }
   const limit = query.limit ? parseInt(query.limit) : defaultPagination.limit
   const page = query.page ? parseInt(query.page) : defaultPagination.page
@@ -45,7 +46,7 @@ const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
       },
     },
   ]
-}
+} */
 
 const populateItineraries = async (cities, mustBePopulated) => {
   if (!mustBePopulated) return Promise.resolve()
@@ -77,12 +78,12 @@ const getCitiesResultsService = async (
   let cities = aggregationResult.results
   await populateItineraries(cities, hasPopulateParam)
 
-  const foundCitiesCount = aggregationResult.totalCount[0]?.count || 0
-  const totalPages = Math.ceil(foundCitiesCount / limit)
+  const totalCount = aggregationResult.totalCount[0]?.count || 0
+  const totalPages = Math.ceil(totalCount / limit)
 
   if (hasBasicInfoParam) cities = getCitiesBasicInfo(cities)
 
-  return { cities, totalPages, foundCitiesCount }
+  return { cities, totalPages, totalCount }
 }
 
 const getFoundCitiesCountService = async (query) => {
@@ -171,7 +172,5 @@ export {
   getCityByIdService,
   getCitiesResultsService,
   getFoundCitiesCountService,
-  getQueryOptions,
-  getSortOptions,
   createCityService,
 }

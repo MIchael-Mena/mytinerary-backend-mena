@@ -6,14 +6,26 @@ import {
   deleteCity,
   updateCity,
 } from '../controllers/cityController.js'
-import validateQueryParams from '../middleware/city/validateQueryParams.js'
 import validateCityData from '../middleware/city/validateCityData.js'
 import { passportJwtAuthentication } from '../middleware/auth.js'
+import createValidateQueryParamsMiddleware from '../middleware/validateQueryParams.js'
 
 const routerCity = express.Router()
 
+const validSortParam = [
+  'name',
+  'country',
+  'population',
+  'area',
+  'rating',
+  'createdAt',
+  'updatedAt',
+]
+
 routerCity.use('/city', [
-  express.Router().get('/', validateQueryParams, getCities),
+  express
+    .Router()
+    .get('/', createValidateQueryParamsMiddleware(validSortParam), getCities),
   express.Router().get('/:id', getCityById),
   express
     .Router()

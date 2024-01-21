@@ -7,6 +7,7 @@ import {
   updateCommentService,
 } from '../services/commentService.js'
 import jsonResponse from '../utils/jsonResponse.js'
+import { getQueryOptions, getSortOptions } from '../utils/queryHelper.js'
 
 const createComment = async (req, res, next) => {
   try {
@@ -55,10 +56,16 @@ const getCommentById = async (req, res, next) => {
 
 const getCommentByItineraryId = async (req, res, next) => {
   try {
-    const comments = await getCommentByItineraryIdService(
-      req.params.itineraryId
+    const sortOptions = getSortOptions(req.query)
+    const { limit, page } = getQueryOptions(req.query)
+
+    const result = await getCommentByItineraryIdService(
+      req.params.itineraryId,
+      page,
+      limit,
+      sortOptions
     )
-    jsonResponse(true, res, 200, 'Comments found.', comments)
+    jsonResponse(true, res, 200, 'Comments found.', result)
   } catch (error) {
     next(error)
   }

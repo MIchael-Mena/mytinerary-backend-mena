@@ -4,10 +4,9 @@ import {
   getCityByIdService,
   updateCityService,
   getCitiesResultsService,
-  getQueryOptions,
-  getSortOptions,
   createCityService,
 } from '../services/cityService.js'
+import { getQueryOptions, getSortOptions } from '../utils/queryHelper.js'
 
 const getCitiesNotFoundMessage = (searchQuery) => {
   return searchQuery
@@ -24,15 +23,14 @@ const getCities = async (req, res, next) => {
       req.query['populate_itineraries'] === 'true' &&
       req.query['basic_info'] !== 'true'
 
-    const { cities, totalPages, foundCitiesCount } =
-      await getCitiesResultsService(
-        queryToFind,
-        sortOptions,
-        page,
-        limit,
-        popItineraries,
-        req.query['basic_info'] === 'true'
-      )
+    const { cities, totalPages, totalCount } = await getCitiesResultsService(
+      queryToFind,
+      sortOptions,
+      page,
+      limit,
+      popItineraries,
+      req.query['basic_info'] === 'true'
+    )
 
     const hasCities = cities.length > 0
 
@@ -45,7 +43,7 @@ const getCities = async (req, res, next) => {
         : 'Cities retrieved successfully.',
       {
         totalPages,
-        foundCitiesCount,
+        totalCount,
         cities,
       }
     )

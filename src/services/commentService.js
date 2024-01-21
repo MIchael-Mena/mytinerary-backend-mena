@@ -6,6 +6,8 @@ import { getItineraryByIdService } from './itineraryService.js'
 import { getUserByIdService } from './userService.js'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
 import { validateId } from './util.js'
+import { buildAggregationPipeline } from '../utils/queryHelper.js'
+import { Types } from 'mongoose'
 
 const modifyCommentOnModel = async (
   commentId,
@@ -129,6 +131,7 @@ const updateCommentService = async (commentId, commentData) => {
 }
 
 const getCommentByIdService = async (commentId) => {
+  // Con esta opcion si el id no existe o existe pero no tiene comentarios se lanzara un error 404
   /*   const comment = await Comment.findById(commentId)
     .orFail(new NotFoundError(`Comment with id ${commentId} not found.`))
     .populate({
@@ -146,28 +149,75 @@ const getCommentByIdService = async (commentId) => {
   return comment
 }
 
-const getCommentByItineraryIdService = async (itineraryId) => {
-  // Con esta opcion si el id no existe o existe pero no tiene comentarios se lanzara un error 404
-  /*   validateId(itineraryId, 'Itinerary')
-  const comments = await Comment.find({ _reference: itineraryId })
-    .populate({
-      path: '_user',
-      select: 'firstName lastName profilePic',
-    })
-    .orFail(
-      new NotFoundError(
-        `Comments for itinerary with id ${itineraryId} not found.`
-      )
-    ) */
+const buildLookupStage = () => ({
+  // Alternativa a populate
+  $lookup: {
+    from: 'users',
+    localField: '_user',
+    foreignField: '_id',
+    as: '_user',
+  },
+})
 
-  // Con esta opcion si el id no existe se lanzara un error y si existe pero no tiene comentarios se devolvera un array vacio
+// Para deshacer el array que devuelve el lookup y quedarme solo con el primer elemento
+const buildUnwindStage = () => ({ $unwind: '$_user' })
+
+const buildProjectStage = () => ({
+  // Para limitar los campos que se devuelven
+  $project: {
+    _id: 1,
+    text: 1,
+    _user: {
+      firstName: '$_user.firstName',
+      lastName: '$_user.lastName',
+      profilePic: '$_user.profilePic',
+    },
+    _reference: 1,
+    onModel: 1,
+    createdAt: 1,
+    updatedAt: 1,
+  },
+})
+
+const getCommentByItineraryIdService = async (
+  itineraryId,
+  page,
+  limit,
+  sortOptions
+) => {
   await getItineraryByIdService(itineraryId)
-  const comments = await Comment.find({ _reference: itineraryId }).populate({
-    path: '_user',
-    select: 'firstName lastName profilePic',
-  })
 
-  return comments
+  const lookup = buildLookupStage()
+  const unwind = buildUnwindStage()
+  const project = buildProjectStage()
+
+  const filterItineraryId = { _reference: new Types.ObjectId(itineraryId) }
+
+  const aggregationPipeline = buildAggregationPipeline(
+    filterItineraryId,
+    sortOptions,
+    page,
+    limit,
+    lookup,
+    unwind,
+    project
+  )
+
+  let aggregationResult
+  try {
+    ;[aggregationResult] = await Comment.aggregate(aggregationPipeline)
+  } catch (error) {
+    console.error(error)
+    throw new Error('Error while aggregating comments')
+  }
+
+  const { results, totalCount } = aggregationResult
+
+  const commentsTotalCount = results.length > 0 ? totalCount[0].count : 0
+
+  const totalPages = Math.ceil(commentsTotalCount / limit)
+
+  return { comments: results, totalPages, totalCount: commentsTotalCount }
 }
 
 export {

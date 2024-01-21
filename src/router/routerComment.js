@@ -9,12 +9,21 @@ import {
 } from '../controllers/commentController.js'
 import { passportJwtAuthentication } from '../middleware/auth.js'
 import { validateComment } from '../middleware/validateComment.js'
+import createValidateQueryParamsMiddleware from '../middleware/validateQueryParams.js'
 
 const routerComment = express.Router()
 
+const validSortParam = ['updatedAt', 'createdAt']
+
 routerComment.use('/comment', [
   express.Router().get('/:id', getCommentById),
-  express.Router().get('/for-itinerary/:itineraryId', getCommentByItineraryId),
+  express
+    .Router()
+    .get(
+      '/for-itinerary/:itineraryId',
+      createValidateQueryParamsMiddleware(validSortParam),
+      getCommentByItineraryId
+    ),
   express
     .Router()
     .post(
