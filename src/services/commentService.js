@@ -45,19 +45,30 @@ const getModelById = async (model, id) => {
   }
 }
 
-const verifyUserHasNotCommentedInModel = async (user, model, modelType) => {
-  const hasCommented = await Comment.exists({
-    _user: user.id,
-    onModel: modelType,
-    _reference: model.id,
-  })
-
-  if (hasCommented)
+const verifyUserHasReachedMaxLimitCommentesInModel = async (
+  user,
+  model,
+  modelType
+) => {
+  const maxCommentsPerModel = 5
+  const verifyLimit =
+    (await Comment.find({
+      _user: user.id,
+      onModel: modelType,
+      _reference: model.id,
+    }).countDocuments()) >= maxCommentsPerModel
+  if (verifyLimit)
     throw new InvalidFieldError(
-      `User has already commented on this ${modelType} with id ${model.id}.`,
+      `Has reached the maximum number of comments per ${modelType} (${maxCommentsPerModel}).`,
       409
     )
 }
+
+/*   if (hasCommented)
+    throw new InvalidFieldError(
+      `User has already commented on this ${modelType} with id ${model.id}.`,
+      409
+    ) */
 
 const createCommentService = async (commentData) => {
   const user = await getUserByIdService(commentData._user)
@@ -65,7 +76,11 @@ const createCommentService = async (commentData) => {
   const model = await getModelById(commentData.onModel, commentData._reference)
 
   // un usuario no puedo comentar mas de una vez en un mismo modelo (itinerario, etc)
-  // await verifyUserHasNotCommentedInModel(user, model, commentData.onModel)
+  await verifyUserHasReachedMaxLimitCommentesInModel(
+    user,
+    model,
+    commentData.onModel
+  )
 
   const newComment = await (
     await Comment.create(commentData)
@@ -168,6 +183,7 @@ const buildProjectStage = () => ({
     _id: 1,
     text: 1,
     _user: {
+      _id: '$_user._id',
       firstName: '$_user.firstName',
       lastName: '$_user.lastName',
       profilePic: '$_user.profilePic',
