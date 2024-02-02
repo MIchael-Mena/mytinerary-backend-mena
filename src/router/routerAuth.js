@@ -48,13 +48,14 @@ routerAuth.use('/user', [
     generateToken,
     authenticate
   ),
-  express
+  // No es necesario loguout con JWT, ya que no se mantiene estado en el servidor
+  /*   express
     .Router()
     .post(
       '/logout',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
       logout
-    ),
+    ), */
   express
     .Router()
     .post(
