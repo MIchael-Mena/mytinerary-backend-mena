@@ -11,7 +11,7 @@ import { getQueryOptions, getSortOptions } from '../utils/queryHelper.js'
 
 const createComment = async (req, res, next) => {
   try {
-    const comment = await createCommentService(req.body)
+    const comment = await createCommentService(req.body, req.user.id)
     jsonResponse(true, res, 201, 'Comment created successfully.', comment)
   } catch (error) {
     next(error)

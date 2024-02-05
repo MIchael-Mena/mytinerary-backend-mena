@@ -10,7 +10,6 @@ import {
   updateItineraryService,
   userHasLikedItineraryService,
 } from '../services/itineraryService.js'
-import { updateCityService } from '../services/cityService.js'
 
 // Puede resivir una lista de itinerarios o un solo itinerario
 const createItineraries = async (req, res, next) => {

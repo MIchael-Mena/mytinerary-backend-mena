@@ -40,13 +40,6 @@ const getItineraryByIdService = async (id, shouldPopulate = false) => {
   if (shouldPopulate) await itinerary.populate(populateItinerary)
 
   return itinerary
-
-  // validateId(id, 'Itinerary')
-  // const itinerary = await Itinerary.findById(id).populate(populateItinerary)
-
-  // verifyItineraryExists(id, itinerary)
-
-  // return itinerary
 }
 
 const getItinerariesByCityIdService = async (cityId) => {

@@ -65,8 +65,8 @@ const verifyUserHasReachedMaxLimitCommentesInModel = async (
     )
 }
 
-const createCommentService = async (commentData) => {
-  const user = await getUserByIdService(commentData._user)
+const createCommentService = async (commentData, userId) => {
+  const user = await getUserByIdService(userId)
 
   const model = await getModelById(commentData.onModel, commentData._reference)
 
@@ -77,8 +77,13 @@ const createCommentService = async (commentData) => {
     commentData.onModel
   )
 
+  const commentToCreate = {
+    ...commentData,
+    _user: user.id,
+  }
+
   const newComment = await (
-    await Comment.create(commentData)
+    await Comment.create(commentToCreate)
   ).populate({
     path: '_user',
     select: 'firstName lastName profilePic',

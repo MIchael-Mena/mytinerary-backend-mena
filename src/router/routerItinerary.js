@@ -18,7 +18,7 @@ routerItinerary.use('/itinerary', [
   express.Router().get('/:id', getItineraryById),
   express.Router().get('/for-city/:cityId', getItinerariesByCityId),
   express.Router().post(
-    '/create', // TODO: agregar validaciones con JOi, obtener el user id del token y no del body
+    '/create', // TODO: agregar validaciones con JOi
     passportJwtAuthentication.authenticate('jwt', { session: false }),
     createItineraries
   ),
