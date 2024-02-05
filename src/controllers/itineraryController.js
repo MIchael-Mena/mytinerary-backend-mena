@@ -17,7 +17,10 @@ const createItineraries = async (req, res, next) => {
   try {
     const isArrayOfItineraries = Array.isArray(req.body)
     const itinerariesData = isArrayOfItineraries ? req.body : [req.body]
-    const itineraries = await createItinerariesService(itinerariesData)
+    const itineraries = await createItinerariesService(
+      itinerariesData,
+      req.user.id
+    )
 
     jsonResponse(
       true,
@@ -61,11 +64,7 @@ const getItineraryById = async (req, res, next) => {
 
 const deleteItinerary = async (req, res, next) => {
   try {
-    const itinerary = await deleteItineraryService(req.params.id)
-
-    const city = await updateCityService(itinerary._city, {
-      $pull: { itineraries: req.params.id },
-    })
+    await deleteItineraryService(req.params.id)
 
     jsonResponse(true, res, 200, 'Itinerary deleted successfully.')
   } catch (error) {

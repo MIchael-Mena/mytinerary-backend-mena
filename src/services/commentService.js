@@ -51,6 +51,7 @@ const verifyUserHasReachedMaxLimitCommentesInModel = async (
   modelType
 ) => {
   const maxCommentsPerModel = 5
+
   const verifyLimit =
     (await Comment.find({
       _user: user.id,
@@ -63,12 +64,6 @@ const verifyUserHasReachedMaxLimitCommentesInModel = async (
       409
     )
 }
-
-/*   if (hasCommented)
-    throw new InvalidFieldError(
-      `User has already commented on this ${modelType} with id ${model.id}.`,
-      409
-    ) */
 
 const createCommentService = async (commentData) => {
   const user = await getUserByIdService(commentData._user)

@@ -24,14 +24,12 @@ routerComment.use('/comment', [
       createValidateQueryParamsMiddleware(validSortParam),
       getCommentByItineraryId
     ),
-  express
-    .Router()
-    .post(
-      '/create',
-      validateComment,
-      passportJwtAuthentication.authenticate('jwt', { session: false }),
-      createComment
-    ),
+  express.Router().post(
+    '/create', // TODO: obtener el user id del token y no del body
+    validateComment,
+    passportJwtAuthentication.authenticate('jwt', { session: false }),
+    createComment
+  ),
   express
     .Router()
     .delete(
