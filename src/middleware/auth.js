@@ -59,9 +59,10 @@ const hashPassword = (req, res, next) => {
 
 const checkEmailDuplicate = async (req, res, next) => {
   try {
-    await getUserByEmailService(req.body.email) // Da un error si no existe el email
+    await getUserByEmailService(req.body.email)
     return jsonResponse(false, res, 403, 'Email already exists')
   } catch (error) {
+    // Error si no existe el email, en este caso es lo que queremos
     next()
   }
 }
@@ -71,7 +72,13 @@ const checkUserExists = async (req, res, next) => {
     req.user = await getUserByEmailService(req.body.email)
     next()
   } catch (error) {
-    return jsonResponse(false, res, 404, `User not found`)
+    // user no existe
+    return jsonResponse(
+      false,
+      res,
+      404,
+      'Invalid email or password, please try again'
+    )
   }
 }
 
@@ -80,15 +87,14 @@ const verifiyPassword = (req, res, next) => {
   const hashPassword = req.user.password
   const isPasswordValid = bcrypt.compareSync(passwordPlain, hashPassword)
 
-  if (!isPasswordValid) {
-    // return jsonResponse(
-    //   false,
-    //   res,
-    //   404,
-    //   `User with email '${req.body.email}' not found`
-    //   )
-    return jsonResponse(false, res, 400, 'Password not valid')
-  }
+  if (!isPasswordValid)
+    // Si el password no es valido
+    return jsonResponse(
+      false,
+      res,
+      400,
+      'Invalid email or password, please try again'
+    )
 
   next()
 }

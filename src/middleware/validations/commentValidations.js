@@ -25,7 +25,12 @@ const verifyUserCommentOwnership = async (req, res, next) => {
     const comment = await getCommentByIdService(commentId)
 
     if (comment._user.toString() !== req.user.id)
-      return jsonResponse(false, res, 403, 'Unauthorized')
+      return jsonResponse(
+        false,
+        res,
+        403,
+        ' You are not allowed to do this action.'
+      )
     req.comment = comment
     next()
   } catch (error) {
