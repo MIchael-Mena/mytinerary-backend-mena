@@ -52,10 +52,10 @@ const getCities = async (req, res, next) => {
   }
 }
 
-// Se espera recibir: req.body = [{city}, {city}] || {city}
 const createCity = async (req, res, next) => {
   try {
-    const cities = await createCityService(req.body)
+    const cityData = Array.isArray(req.body) ? req.body : [req.body]
+    const cities = await createCityService(cityData)
     jsonResponse(true, res, 201, 'Cities created successfully.', cities)
   } catch (error) {
     next(error)

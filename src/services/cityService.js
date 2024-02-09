@@ -14,40 +14,6 @@ const populateCity = {
   },
 }
 
-/* const getPagination = (query) => {
-  const defaultPagination = { limit: 9, page: 1 }
-  const limit = query.limit ? parseInt(query.limit) : defaultPagination.limit
-  const page = query.page ? parseInt(query.page) : defaultPagination.page
-  return { limit, page }
-}
-
-const getSortOptions = (query) => {
-  const sortField = query.sort || 'updatedAt' // Si no se especifica el campo por el que se quiere ordenar, se ordena por fecha de actualización
-  const sortOrder = query.order === 'desc' ? -1 : 1
-  return { [sortField]: sortOrder }
-}
-
-const getQueryOptions = (query) => {
-  const searchQuery = query.search ? query.search.trim().toLowerCase() : ''
-  const queryToFind = searchQuery
-    ? { name: { $regex: `^${searchQuery}`, $options: 'i' } }
-    : {}
-  return { ...getPagination(query), queryToFind }
-}
-
-const buildAggregationPipeline = (queryToFind, sortOptions, page, limit) => {
-  return [
-    { $match: queryToFind },
-    { $sort: sortOptions },
-    {
-      $facet: {
-        results: [{ $skip: (page - 1) * limit }, { $limit: limit }], // Paginación
-        totalCount: [{ $count: 'count' }],
-      },
-    },
-  ]
-} */
-
 const populateItineraries = async (cities, mustBePopulated) => {
   if (!mustBePopulated) return Promise.resolve()
   await City.populate(cities, populateCity)
@@ -96,12 +62,8 @@ const getFoundCitiesCountService = async (query) => {
 }
 
 const deleteCityService = async (cityId) => {
-  validateId(cityId, 'City')
-  const city = await City.findByIdAndDelete(cityId)
-  verifyCityExists(city, cityId) // Verifico que se haya encontrado la ciudad y por lo tanto eliminado
-
-  await deleteItinerariesByCityIdService(cityId)
-
+  const city = await deleteItinerariesByCityIdService(cityId, false)
+  city.deleteOne()
   return city
 }
 
@@ -147,11 +109,11 @@ const getCityByIdService = async (cityId, shouldBePopulated = false) => {
   return city
 }
 
+// Crear validaciones con JOi
 const createCityService = async (cityData) => {
-  const hasItineraries = Array.isArray(cityData)
-    ? cityData.some((city) => city.itineraries.length > 0)
-    : cityData.itineraries.length > 0
-
+  const hasItineraries = cityData.some(
+    (city) => city.itineraries && city.itineraries.length > 0
+  )
   if (hasItineraries)
     throw new InvalidFieldError(
       'Itineraries cannot be created with the city, use the itinerary endpoint.',

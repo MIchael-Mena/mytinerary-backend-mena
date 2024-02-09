@@ -117,7 +117,6 @@ const passportJwtAuthentication = passport.use(
     async (payload, done) => {
       try {
         const user = await getUserByEmailService(payload.email)
-
         // Si el usuario no está online o no está activo, no se ejecuta el callback, y se devuelve un error 401
         if (!user.online || !user.active) return done(null, false)
 
@@ -129,6 +128,20 @@ const passportJwtAuthentication = passport.use(
     }
   )
 )
+/* 
+  Middleware para validar el rol del usuario, y autorizar el acceso a una ruta 
+  roles: [ 'admin', 'user' ]
+*/
+const validateUserRole = (roles) => {
+  // roles puede ser un arrray de roles, o un solo rol
+  roles = Array.isArray(roles) ? roles : [roles]
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return jsonResponse(false, res, 403, 'Unauthorized')
+    }
+    next()
+  }
+}
 
 export {
   hashPassword,
@@ -139,4 +152,5 @@ export {
   generateToken,
   checkEmailDuplicate,
   passportJwtAuthentication,
+  validateUserRole,
 }

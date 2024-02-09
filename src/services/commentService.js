@@ -102,16 +102,13 @@ const verifyCommentExists = (commentId, comment) => {
     throw new NotFoundError(`Comment with id ${commentId} not found.`)
 }
 
-const deleteCommentService = async (commentId) => {
-  const comment = await Comment.findByIdAndDelete(commentId)
-
-  verifyCommentExists(commentId, comment)
-
+const deleteCommentService = async (comment) => {
+  const { _id: commentId } = comment
   await deleteCommentOnModel(commentId, comment.onModel, comment._reference)
-
   await User.findByIdAndUpdate(comment._user, {
     $pull: { comments: commentId },
   })
+  await comment.deleteOne()
 }
 
 const deleteCommentsByItineraryIdService = async (itineraryId) => {
@@ -130,12 +127,14 @@ const deleteCommentsByItineraryIdService = async (itineraryId) => {
 }
 
 const updateCommentService = async (commentId, commentData) => {
-  if (commentData.text === '')
-    throw new InvalidFieldError('Comment text cannot be empty.')
-  const comment = { text: commentData.text } // Solo se puede modificar el texto del comentario
-  const commentUpdated = await Comment.findByIdAndUpdate(commentId, comment, {
-    new: true, // devuelve el documento actualizado
-  })
+  const commentText = { text: commentData.text } // Solo se puede modificar el texto del comentario
+  const commentUpdated = await Comment.findByIdAndUpdate(
+    commentId,
+    commentText,
+    {
+      new: true, // devuelve el documento actualizado
+    }
+  )
     .populate({
       path: '_user',
       select: 'firstName lastName profilePic',

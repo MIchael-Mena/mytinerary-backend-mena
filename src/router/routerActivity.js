@@ -1,5 +1,8 @@
 import express from 'express'
-import { passportJwtAuthentication } from '../middleware/auth.js'
+import {
+  passportJwtAuthentication,
+  validateUserRole,
+} from '../middleware/auth.js'
 import {
   createActivities,
   deleteActivitiesByItineraryId,
@@ -21,6 +24,7 @@ routerActivity.use('/activity', [
     .post(
       '/create',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       createActivities
     ),
   express
@@ -28,6 +32,7 @@ routerActivity.use('/activity', [
     .delete(
       '/delete/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       deleteActivity
     ),
   express
@@ -35,6 +40,7 @@ routerActivity.use('/activity', [
     .delete(
       '/delete-for-itinerary/:itineraryId',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       deleteActivitiesByItineraryId
     ),
   express
@@ -42,6 +48,7 @@ routerActivity.use('/activity', [
     .patch(
       '/update/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       updateActivity
     ),
 ])

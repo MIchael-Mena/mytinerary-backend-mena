@@ -7,9 +7,15 @@ import {
   getCommentByItineraryId,
   updateComment,
 } from '../controllers/commentController.js'
-import { passportJwtAuthentication } from '../middleware/auth.js'
-import { validateComment } from '../middleware/validateComment.js'
-import createValidateQueryParamsMiddleware from '../middleware/validateQueryParams.js'
+import {
+  passportJwtAuthentication,
+  validateUserRole,
+} from '../middleware/auth.js'
+import validateQueryParams from '../middleware/validations/validateQueryParams.js'
+import {
+  validateComment,
+  verifyUserCommentOwnership,
+} from '../middleware/validations/commentValidations.js'
 
 const routerComment = express.Router()
 
@@ -21,15 +27,16 @@ routerComment.use('/comment', [
     .Router()
     .get(
       '/for-itinerary/:itineraryId',
-      createValidateQueryParamsMiddleware(validSortParam),
+      validateQueryParams(validSortParam),
       getCommentByItineraryId
     ),
   express
     .Router()
     .post(
       '/create',
-      validateComment,
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole(['admin', 'user']),
+      validateComment,
       createComment
     ),
   express
@@ -37,6 +44,8 @@ routerComment.use('/comment', [
     .delete(
       '/delete/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole(['admin', 'user']),
+      verifyUserCommentOwnership,
       deleteComment
     ),
   express
@@ -44,14 +53,17 @@ routerComment.use('/comment', [
     .delete(
       '/delete-for-itinerary/:itineraryId',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       deleteCommentsByItineraryId
     ),
   express
     .Router()
     .patch(
       '/update/:id',
-      validateComment,
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole(['admin', 'user']),
+      verifyUserCommentOwnership,
+      validateComment,
       updateComment
     ),
 ])

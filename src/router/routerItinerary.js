@@ -7,10 +7,13 @@ import {
   getItinerariesByCityId,
   addLikeToItinerary,
   removeLikeFromItinerary,
-  userHasLikedItinerary,
   deleteItinerariesByCityId,
 } from '../controllers/itineraryController.js'
-import { passportJwtAuthentication } from '../middleware/auth.js'
+import {
+  passportJwtAuthentication,
+  validateUserRole,
+} from '../middleware/auth.js'
+import validateItineraryData from '../middleware/validations/validateItineraryData.js'
 
 const routerItinerary = express.Router()
 
@@ -18,8 +21,10 @@ routerItinerary.use('/itinerary', [
   express.Router().get('/:id', getItineraryById),
   express.Router().get('/for-city/:cityId', getItinerariesByCityId),
   express.Router().post(
-    '/create', // TODO: agregar validaciones con JOi
+    '/create',
     passportJwtAuthentication.authenticate('jwt', { session: false }),
+    validateUserRole('admin'),
+    validateItineraryData, // TODO: agregar validaciones con JOi
     createItineraries
   ),
   express
@@ -27,6 +32,7 @@ routerItinerary.use('/itinerary', [
     .delete(
       '/delete/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       deleteItinerary
     ),
   express
@@ -34,6 +40,7 @@ routerItinerary.use('/itinerary', [
     .delete(
       '/delete-for-city/:cityId',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       deleteItinerariesByCityId
     ),
   express
@@ -41,25 +48,21 @@ routerItinerary.use('/itinerary', [
     .patch(
       '/update/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       updateItinerary
     ),
   express.Router().post(
-    '/like/:id', // Itinerary ID in params and user Id in req.user.id
+    '/like/:id', // Itinerary ID in params
     passportJwtAuthentication.authenticate('jwt', { session: false }),
+    validateUserRole('admin'),
     addLikeToItinerary
   ),
   express.Router().delete(
-    '/dislike/:id', // Itinerary ID in params and user Id in req.user.id
+    '/dislike/:id', // Itinerary ID in params
     passportJwtAuthentication.authenticate('jwt', { session: false }),
+    validateUserRole('admin'),
     removeLikeFromItinerary
   ),
-  express
-    .Router()
-    .post(
-      '/check-user-like/:id',
-      passportJwtAuthentication.authenticate('jwt', { session: false }),
-      userHasLikedItinerary
-    ),
 ])
 
 export default routerItinerary

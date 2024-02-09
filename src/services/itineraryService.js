@@ -1,17 +1,11 @@
 import { NotFoundError } from '../exceptions/NotFoundError.js'
 import Itinerary from '../models/Itinerary.js'
 import { getCityByIdService } from './cityService.js'
-import { getUserByIdService } from './userService.js'
 import { validateId } from './util.js'
 import Activity from '../models/Activity.js'
 import City from '../models/City.js'
 import { InvalidFieldError } from '../exceptions/InvalidFieldError.js'
-import {
-  deleteCommentService,
-  deleteCommentsByItineraryIdService,
-} from './commentService.js'
-import Comment from '../models/Comment.js'
-import User from '../models/User.js'
+import { deleteCommentService } from './commentService.js'
 
 // TODO: revisar que si se cambia el nombre de una propiedad en el modelo, se cambie también en el populate
 // tal vez se pueda hacer un populate dinámico con un objeto que tenga como clave el nombre de la propiedad
@@ -67,36 +61,15 @@ const deleteItineraryService = async (id) => {
   await itinerary.deleteOne()
 }
 
-const deleteItineraryServiceAlternative = async (id) => {
-  validateId(id, 'Itinerary')
-  const itinerary = await Itinerary.findByIdAndDelete(id)
-  verifyItineraryExists(id, itinerary)
-
-  await City.updateOne({ _id: itinerary._city }, { $pull: { itineraries: id } })
-
-  // Elimino las actividades del itinerario, lo puedo hacer de esta forma ya que no hay referencia a otra coleccion
-  await Activity.deleteMany({ _id: { $in: itinerary.activities } })
-
-  // Primero, obténgo los comentarios por su ID
-  const comments = await Comment.find({ _id: { $in: itinerary.comments } })
-  // Luego, extraigo los IDs de usuario de los comentarios
-  const userIds = comments.map((comment) => comment._user)
-  // Borrar todos los comentarios del itinerario
-  await Comment.deleteMany({ _id: { $in: itinerary.comments } })
-  // Finalmente, actualizo los documentos de usuario
-  await User.updateMany(
-    { _id: { $in: userIds } }, // Filtra los usuarios que tienen un comentario en el itinerario
-    { $pull: { comments: { $in: itinerary.comments } } } // Elimina la referencia al comentario
-  )
-  return itinerary
-}
-
-const deleteItinerariesByCityIdService = async (cityId) => {
+const deleteItinerariesByCityIdService = async (
+  cityId,
+  throwIfEmpty = true
+) => {
   const city = await getCityByIdService(cityId, false)
 
   const { itineraries } = city
 
-  if (itineraries.length === 0)
+  if (itineraries.length === 0 && throwIfEmpty)
     throw new NotFoundError('There are no itineraries to delete for this city.')
 
   itineraries.forEach(
@@ -126,38 +99,10 @@ const createItineraryService = async (itineraryData) => {
   return itinerary
 }
 
-const verifyItineraryData = (itinerariesData) => {
-  // Se podria usar el schema de Joi para validar los datos
-  const hasActivities = itinerariesData.some(
-    (itinerary) => itinerary.activities && itinerary.activities.length > 0
-  )
-
-  const hasComments = itinerariesData.some(
-    (itinerary) => itinerary.comments && itinerary.comments.length > 0
-  )
-
-  if (hasComments)
-    throw new InvalidFieldError(
-      'Itineraries cannot have comments. Use the comment endpoint to add comments.'
-    )
-
-  if (hasActivities)
-    throw new InvalidFieldError(
-      'Itineraries cannot have activities. Use the activity endpoint to add activities.'
-    )
-
-  if (itinerariesData.duration && itinerariesData.duration !== 0)
-    throw new InvalidFieldError(
-      'Duration initial value must be 0. It will update automatically when activities are added.'
-    )
-}
-
 const createItinerariesService = async (itinerariesData, userId) => {
   // TODO: Mejorar el caso en el que se encuntra un error con un id de ciudad y previamente
   // se crearon itinerarios, se deberia avisar que se crearon algunos itinerarios
   // o no permitir la creación de ninguno (ver transacciones)
-  verifyItineraryData(itinerariesData)
-
   const itineraries = []
   for (const itineraryData of itinerariesData) {
     const { _city } = itineraryData
@@ -179,53 +124,47 @@ const createItinerariesService = async (itinerariesData, userId) => {
   return Promise.all(itineraries)
 }
 
-const addLikeToItineraryService = async (itineraryId, userId) => {
+const updateLikeOnItineraryService = async (
+  itineraryId,
+  user,
+  isAddingLike,
+  updateUserFavourites
+) => {
   const itinerary = await getItineraryByIdService(itineraryId)
 
-  // verifico si el usuario ya tiene un like en este itinerario
-  const { user, hasLiked } = await userHasLikedItineraryService(
-    itineraryId,
-    userId
-  )
-  if (hasLiked) {
-    throw new InvalidFieldError('User already liked this itinerary.', 409)
+  const hasLiked = user.favouriteItineraries.includes(itineraryId)
+
+  if ((!isAddingLike && !hasLiked) || (isAddingLike && hasLiked)) {
+    const errorMessage = isAddingLike
+      ? 'User already liked this itinerary.'
+      : 'User has not liked this itinerary.'
+    throw new InvalidFieldError(errorMessage, 409)
   }
 
-  await user.updateOne({ $push: { favouriteItineraries: itineraryId } })
+  await user.updateOne(updateUserFavourites(itineraryId))
 
-  // Al hacer esto me ahorro tener que estar calculando el total de likes cuando se pida un itinerario
-  itinerary.likes++
+  isAddingLike ? itinerary.likes++ : itinerary.likes--
 
   await itinerary.save()
-  return { totalLikes: itinerary.likes, user }
+  return { totalLikes: itinerary.likes }
 }
 
-const removeLikeFromItineraryService = async (itineraryId, userId) => {
-  const itinerary = await getItineraryByIdService(itineraryId)
-
-  const { user, hasLiked } = await userHasLikedItineraryService(
+const addLikeToItineraryService = async (itineraryId, user) => {
+  return updateLikeOnItineraryService(
     itineraryId,
-    userId
-  )
-  if (!hasLiked) {
-    throw new InvalidFieldError('User has not liked this itinerary.', 409)
-  }
-
-  await user.updateOne({ $pull: { favouriteItineraries: itineraryId } })
-
-  itinerary.likes--
-
-  await itinerary.save()
-  return { totalLikes: itinerary.likes, user }
-}
-
-const userHasLikedItineraryService = async (itineraryId, userId) => {
-  const user = await getUserByIdService(userId)
-
-  return {
-    hasLiked: user.favouriteItineraries.includes(itineraryId),
     user,
-  }
+    true,
+    (itineraryId) => ({ $push: { favouriteItineraries: itineraryId } })
+  )
+}
+
+const removeLikeFromItineraryService = async (itineraryId, user) => {
+  return updateLikeOnItineraryService(
+    itineraryId,
+    user,
+    false,
+    (itineraryId) => ({ $pull: { favouriteItineraries: itineraryId } })
+  )
 }
 
 export {
@@ -237,6 +176,5 @@ export {
   createItinerariesService,
   addLikeToItineraryService,
   removeLikeFromItineraryService,
-  userHasLikedItineraryService,
   deleteItinerariesByCityIdService,
 }

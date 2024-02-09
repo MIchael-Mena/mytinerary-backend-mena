@@ -6,9 +6,12 @@ import {
   deleteCity,
   updateCity,
 } from '../controllers/cityController.js'
-import validateCityData from '../middleware/city/validateCityData.js'
-import { passportJwtAuthentication } from '../middleware/auth.js'
-import createValidateQueryParamsMiddleware from '../middleware/validateQueryParams.js'
+import validateCityData from '../middleware/validations/validateCityData.js'
+import {
+  passportJwtAuthentication,
+  validateUserRole,
+} from '../middleware/auth.js'
+import validateQueryParams from '../middleware/validations/validateQueryParams.js'
 
 const routerCity = express.Router()
 
@@ -23,15 +26,14 @@ const validSortParam = [
 ]
 
 routerCity.use('/city', [
-  express
-    .Router()
-    .get('/', createValidateQueryParamsMiddleware(validSortParam), getCities),
+  express.Router().get('/', validateQueryParams(validSortParam), getCities),
   express.Router().get('/:id', getCityById),
   express
     .Router()
     .post(
       '/create',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       createCity
     ),
   express
@@ -39,6 +41,7 @@ routerCity.use('/city', [
     .patch(
       '/update/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       validateCityData,
       updateCity
     ),
@@ -47,6 +50,7 @@ routerCity.use('/city', [
     .delete(
       '/delete/:id',
       passportJwtAuthentication.authenticate('jwt', { session: false }),
+      validateUserRole('admin'),
       deleteCity
     ),
 ])

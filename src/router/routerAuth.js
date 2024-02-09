@@ -23,7 +23,7 @@ import {
 
 const routerAuth = express.Router()
 
-routerAuth.use('/user', [
+routerAuth.use('/auth', [
   express.Router().post(
     '/register',
     validateUserDataRegister,

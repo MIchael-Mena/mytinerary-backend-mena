@@ -8,10 +8,8 @@ import {
   getItineraryByIdService,
   removeLikeFromItineraryService,
   updateItineraryService,
-  userHasLikedItineraryService,
 } from '../services/itineraryService.js'
 
-// Puede resivir una lista de itinerarios o un solo itinerario
 const createItineraries = async (req, res, next) => {
   try {
     const isArrayOfItineraries = Array.isArray(req.body)
@@ -87,7 +85,7 @@ const addLikeToItinerary = async (req, res, next) => {
 
     const { totalLikes } = await addLikeToItineraryService(
       itineraryId,
-      req.user.id
+      req.user
     )
 
     jsonResponse(true, res, 200, 'Like added successfully.', {
@@ -105,33 +103,13 @@ const removeLikeFromItinerary = async (req, res, next) => {
 
     const { totalLikes } = await removeLikeFromItineraryService(
       itineraryId,
-      req.user.id
+      req.user
     )
 
     jsonResponse(true, res, 200, 'Like removed successfully.', {
       totalLikes,
       itineraryId,
     })
-  } catch (error) {
-    next(error)
-  }
-}
-
-const userHasLikedItinerary = async (req, res, next) => {
-  try {
-    const itineraryId = req.params.id
-
-    const { hasLiked } = await userHasLikedItineraryService(
-      itineraryId,
-      req.user.id
-    )
-
-    jsonResponse(
-      hasLiked,
-      res,
-      200,
-      hasLiked ? 'User has liked itinerary.' : 'User has not liked itinerary.'
-    )
   } catch (error) {
     next(error)
   }
@@ -156,5 +134,4 @@ export {
   getItinerariesByCityId,
   addLikeToItinerary,
   removeLikeFromItinerary,
-  userHasLikedItinerary,
 }

@@ -1,6 +1,6 @@
-import jsonResponse from '../utils/jsonResponse.js'
+import jsonResponse from '../../utils/jsonResponse.js'
 
-const createValidateQueryParamsMiddleware = (validSortFields) => {
+const validateQueryParams = (validSortFields) => {
   return (req, res, next) => {
     const validSortOptions = ['asc', 'desc']
     const errors = []
@@ -43,4 +43,4 @@ const createValidateQueryParamsMiddleware = (validSortFields) => {
   }
 }
 
-export default createValidateQueryParamsMiddleware
+export default validateQueryParams

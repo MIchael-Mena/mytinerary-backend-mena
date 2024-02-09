@@ -20,7 +20,7 @@ const createComment = async (req, res, next) => {
 
 const deleteComment = async (req, res, next) => {
   try {
-    await deleteCommentService(req.params.id)
+    await deleteCommentService(req.comment)
     jsonResponse(true, res, 200, 'Comment deleted successfully.')
   } catch (error) {
     next(error)
